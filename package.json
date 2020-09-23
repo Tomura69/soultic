@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "dependencies": {
+    "apollo-link-error": "^1.1.13",
+    "graphql-tag": "^2.11.0"
+  }
+}

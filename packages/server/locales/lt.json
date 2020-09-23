@@ -1,0 +1,21 @@
+{
+  "validation.is-email": "El. paštas netinkamas",
+  "validation.invalid-password": "Neteisingas slaptažodis",
+  "validation.email-already-exist": "Šis el. paštas jau yra naudojamas",
+  "validation.firstname-is-not-blank": "Vardas negali būti tuščias",
+  "validation.firstname-min-length": "Vardas turi būti sudarytas bent iš %s raidžių",
+  "validation.firstname-max-length": "Vardas turi būti sudarytas iš mažiau negu %s raidžių",
+  "validation.lastname-is-not-blank": "Pavardė negali būti tuščia",
+  "validation.lastname-min-length": "Pavardė turi būti sudaryta bent iš %s raidžių",
+  "validation.lastname-max-length": "Pavardė turi būti sudaryta iš mažiau negu %s raidžių",
+  "validation.password-min-length": "Slaptažodis turi būti sudarytas bent iš %s simbolių",
+  "validation.password-regex": "Slaptažodyje turi būti didžioji raidė, mažoji raidė ir skaičius",
+  "error.must-login": "Pirmiausia reikia prisijungti",
+  "error.access-denied": "Jūs neturite tam teisių",
+  "error.user-doesnt-exist": "Toks vartotojas neegzistuoja",
+  "error.user-is-deleted": "Šis vartotojas yra ištrintas",
+  "error.confirm-email": "Jūs privalote patvirtinti savo el. pašto adresą",
+  "error.invalid-token": "Negaliojantis raktas",
+  "error.something-went-wrong": "Įvyko klaida",
+  "error.cant-update-yourself": "Savo paskyros redaguoti negalima"
+}

@@ -1,0 +1,6 @@
+node_modules
+packages/admin_ui/dist
+packages/server/dist
+.env
+ormconfig.json
+dist
