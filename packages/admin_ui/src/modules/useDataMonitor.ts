@@ -4,12 +4,12 @@ import _ from 'lodash'
 const useDataMonitor = <Entity>(data: Ref<Entity>) => {
   const originalData = ref()
 
-  const dataChanged = ref(false)
+  const isDataChanged = ref(false)
   const skipChangeCheck = ref(false)
 
   const makeEqual = () => {
     originalData.value = { ...data.value }
-    dataChanged.value = false
+    isDataChanged.value = false
   }
 
   const getDifference = () => {
@@ -34,14 +34,14 @@ const useDataMonitor = <Entity>(data: Ref<Entity>) => {
         originalData.value = { ...newVal }
       }
       if (!skipChangeCheck.value)
-        dataChanged.value = !_.isEqual(originalData.value, newVal)
+        isDataChanged.value = !_.isEqual(originalData.value, newVal)
       skipChangeCheck.value = false
     },
     { deep: true }
   )
 
   return {
-    dataChanged,
+    isDataChanged,
     getDifference,
     makeEqual,
   }

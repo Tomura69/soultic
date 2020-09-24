@@ -58,7 +58,7 @@
     <v-col class="mb-2 text-right">
       <v-btn
         color="success"
-        :disabled="!dataChanged"
+        :disabled="!isDataChanged"
         @click="updateData()"
         class="mr-5"
       >
@@ -118,7 +118,7 @@ export default defineComponent({
       MutationUpdateUserArgs
     >(UPDATE_USER)
 
-    const { getDifference, dataChanged, makeEqual } = useDataMonitor(user)
+    const { getDifference, isDataChanged, makeEqual } = useDataMonitor(user)
 
     onDone(async (res) => {
       if (res && res.data && res.data.updateUser) {
@@ -150,7 +150,7 @@ export default defineComponent({
       user,
       queryLoading,
       mutationLoading,
-      dataChanged,
+      isDataChanged,
       updateData,
       deleteUser,
       restoreUser,
