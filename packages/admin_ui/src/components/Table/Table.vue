@@ -36,13 +36,9 @@
         :no-data-text="$t('no-data')"
       >
         <template v-slot:item="{ item, headers }">
-          <router-link
-            :to="`/users/${item.id}`"
-            class="text-center"
-            tag="tr"
-            style="cursor: pointer"
-          >
+          <tr class="text-center">
             <template v-for="(header, index) in headers">
+              <!-- Confirmed -->
               <td v-if="header.value === 'confirmed'" :key="index">
                 <v-icon
                   small
@@ -52,6 +48,35 @@
                   mdi-circle
                 </v-icon>
               </td>
+              <!-- Actions -->
+              <td v-else-if="header.value === ''" :key="index">
+                <v-btn
+                  x-small
+                  icon
+                  v-if="actions.edit"
+                  @click="doAction('edit', item)"
+                >
+                  <v-icon>mdi-pencil</v-icon>
+                </v-btn>
+
+                <v-btn
+                  x-small
+                  icon
+                  v-if="actions.edit && actions.delete"
+                  @click="
+                    doAction(
+                      item.deletedAt === null ? 'delete' : 'restore',
+                      item
+                    )
+                  "
+                  class="ml-1"
+                >
+                  <v-icon>
+                    {{ item.deletedAt === null ? 'mdi-delete' : 'mdi-restore' }}
+                  </v-icon>
+                </v-btn>
+              </td>
+              <!-- Blank -->
               <td
                 v-else-if="
                   item[header.value] === null ||
@@ -62,9 +87,10 @@
               >
                 {{ $t('blank') }}
               </td>
+              <!-- Item value -->
               <td v-else :key="index">{{ item[header.value] }}</td>
             </template>
-          </router-link>
+          </tr>
         </template>
       </v-data-table>
       <TablePagination
@@ -91,7 +117,6 @@ import Fields from '@/components/Table/TableFields.vue'
 import Filters from '@/components/Table/TableFilters.vue'
 import TablePagination from '@/components/Table/TablePagination.vue'
 import { TABLE_FIELDS_PREFIX } from '@/constants'
-import USERS from '@/graphql/queries/USERS'
 import { useQuery, useResult } from '@vue/apollo-composable'
 import useFilters from '@/modules/useFilters'
 import useRouter from '@/modules/useRouter'
@@ -101,6 +126,8 @@ import {
   TableSearchOptions,
   TableFilters,
 } from '@/types/Table'
+import { DocumentNode } from 'graphql'
+import { Actions, ActionType } from '@/types/Actions'
 
 interface RequestVars {
   options: {
@@ -115,6 +142,10 @@ export default defineComponent({
   name: 'Table',
   components: { Search, Fields, Filters, TablePagination },
   props: {
+    queryDocument: {
+      type: Object as () => DocumentNode,
+      required: true,
+    },
     headers: {
       type: Array as () => TableHeaders,
       required: true,
@@ -130,6 +161,10 @@ export default defineComponent({
     searchOptions: {
       type: Object as () => TableSearchOptions,
       required: true,
+    },
+    actions: {
+      type: Object as () => Actions<unknown>,
+      default: () => ({} as Actions<unknown>),
     },
   },
   setup(props, { root }) {
@@ -169,6 +204,61 @@ export default defineComponent({
         sort: `${sortField}_${sortAsc ? 'ASC' : 'DESC'}`,
       })
     })
+
+    /**
+     * Filters
+     */
+
+    const { filters, filtersData, changeFilters } = useFilters(
+      root,
+      props.filtersData
+    )
+
+    // Fetching data
+
+    const searchQuery = computed(() => {
+      const {
+        searchOptions: { filter },
+      } = props
+      const search = currentQuery.value.search as string
+      if (!search) return {}
+      return filter(String(search))
+    })
+
+    const requestVars = computed(() => {
+      return {
+        options: {
+          skip: (options.page - 1) * options.limit,
+          take: options.limit,
+          sort: {
+            [options.sortField]: options.sortAsc ? 'ASC' : 'DESC',
+          },
+          filter: _.merge(filters.value, searchQuery.value),
+        },
+      }
+    })
+
+    const { result, refetch, loading } = useQuery(
+      props.queryDocument,
+      { ...requestVars.value },
+      {
+        fetchPolicy: 'cache-and-network',
+      }
+    )
+
+    const data = useResult(result, { items: [], totalCount: 0 })
+
+    const debouncedRefetch = _.debounce((vars: RequestVars) => {
+      refetch(vars)
+    }, 100)
+
+    watch(
+      () => currentQuery.value,
+      () => {
+        Object.assign(options, parseOptions())
+        debouncedRefetch(requestVars.value)
+      }
+    )
 
     /**
      *  Table headers
@@ -214,63 +304,39 @@ export default defineComponent({
         .map((header) => {
           return {
             align: 'center',
-            class: 'text-no-wrap pr-1 grey lighten-4',
+            class: 'text-no-wrap grey lighten-4',
             sortable: false,
             ...header,
           }
         })
+        .concat(
+          Object.keys(props.actions).length // Add actions header if actions was passed
+            ? [
+                {
+                  text: '',
+                  value: '',
+                  class: 'text-no-wrap grey lighten-4',
+                  sortable: false,
+                  align: 'center',
+                  width: 100,
+                },
+              ]
+            : []
+        )
     )
 
-    const { filters, filtersData, changeFilters } = useFilters(
-      root,
-      props.filtersData
-    )
+    const doAction = async (type: ActionType, item: unknown) => {
+      const callback = props.actions[type]
+      if (!callback) return
 
-    // Fetching data
-
-    const searchQuery = computed(() => {
-      const {
-        searchOptions: { filter },
-      } = props
-      const search = currentQuery.value.search as string
-      if (!search) return {}
-      return filter(String(search))
-    })
-
-    const requestVars = computed(() => {
-      return {
-        options: {
-          skip: (options.page - 1) * options.limit,
-          take: options.limit,
-          sort: {
-            [options.sortField]: options.sortAsc ? 'ASC' : 'DESC',
-          },
-          filter: _.merge(filters.value, searchQuery.value),
-        },
+      try {
+        loading.value = true
+        await callback(item)
+        await refetch() // After refetch loading will be set to false
+      } catch {
+        loading.value = false
       }
-    })
-
-    const { result, refetch, loading } = useQuery(
-      USERS,
-      { ...requestVars.value },
-      {
-        fetchPolicy: 'cache-and-network',
-      }
-    )
-
-    const data = useResult(result, { items: [], totalCount: 0 })
-
-    const debouncedRefetch = _.debounce((vars: RequestVars) => {
-      refetch(vars)
-    }, 100)
-
-    watch(
-      () => currentQuery.value,
-      () => {
-        Object.assign(options, parseOptions())
-        debouncedRefetch(requestVars.value)
-      }
-    )
+    }
 
     return {
       options,
@@ -281,6 +347,7 @@ export default defineComponent({
       changeFilters,
       fields,
       loading,
+      doAction,
     }
   },
 })

@@ -7,12 +7,12 @@ const useDataMonitor = <Entity>(data: Ref<Entity>) => {
   const isDataChanged = ref(false)
   const skipChangeCheck = ref(false)
 
-  const makeEqual = () => {
+  const makeDataEqual = () => {
     originalData.value = { ...data.value }
     isDataChanged.value = false
   }
 
-  const getDifference = () => {
+  const getDataDifference = () => {
     // type Entity = typeof data.value
     const difference: Partial<Entity> = {}
     if (data.value)
@@ -42,8 +42,8 @@ const useDataMonitor = <Entity>(data: Ref<Entity>) => {
 
   return {
     isDataChanged,
-    getDifference,
-    makeEqual,
+    getDataDifference,
+    makeDataEqual,
   }
 }
 

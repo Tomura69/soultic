@@ -5,6 +5,8 @@
       :table-options="tableOptions"
       :filtersData="filtersData"
       :searchOptions="searchOptions"
+      :query-document="USERS"
+      :actions="actions"
     />
   </div>
 </template>
@@ -18,6 +20,7 @@ import {
   TableSearchOptions,
   TableFilters,
 } from '@/types/Table'
+import { Actions } from '@/types/Actions'
 import {
   UserFilterParameters,
   User,
@@ -25,6 +28,9 @@ import {
 } from '@/generated/graphql'
 import baseFilters from '@/shared/baseFilters'
 import useRouter from '@/modules/useRouter'
+import USERS from '@/graphql/queries/USERS'
+import { useMutation } from '@vue/apollo-composable'
+import UPDATE_USER from '@/graphql/mutations/UPDATE_USER'
 
 export default defineComponent({
   name: 'Users',
@@ -56,13 +62,13 @@ export default defineComponent({
       {
         text: $t('createdAt'),
         value: 'createdAt',
-        selected: false,
+        selected: true,
         sortable: true,
       },
       {
         text: $t('updatedAt'),
         value: 'updatedAt',
-        selected: true,
+        selected: false,
         sortable: true,
       },
       {
@@ -75,7 +81,7 @@ export default defineComponent({
         text: $t('confirmed'),
         value: 'confirmed',
         width: 120,
-        selected: true,
+        selected: false,
       },
     ]
 
@@ -140,11 +146,30 @@ export default defineComponent({
       baseFilters.updatedAt,
     ]
 
+    const { mutate } = useMutation(UPDATE_USER)
+
+    const actions: Actions<User> = {
+      edit({ id }) {
+        root.$router.push(`/users/${id}`)
+      },
+      async delete({ id }) {
+        await mutate({
+          id,
+          input: { deletedAt: new Date().toString() },
+        })
+      },
+      async restore({ id }) {
+        await mutate({ id, input: { deletedAt: null } })
+      },
+    }
+
     return {
       filtersData,
       headers,
       tableOptions,
       searchOptions,
+      USERS,
+      actions,
     }
   },
 })

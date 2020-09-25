@@ -118,20 +118,22 @@ export default defineComponent({
       MutationUpdateUserArgs
     >(UPDATE_USER)
 
-    const { getDifference, isDataChanged, makeEqual } = useDataMonitor(user)
+    const { getDataDifference, isDataChanged, makeDataEqual } = useDataMonitor(
+      user
+    )
 
     onDone(async (res) => {
       if (res && res.data && res.data.updateUser) {
         mutationLoading.value = true
         await refetch()
-        makeEqual()
+        makeDataEqual()
         mutationLoading.value = false
         addToast({ type: 'success', message: root.$t('changes-saved') })
       }
     })
 
     const updateData = () => {
-      const input = getDifference()
+      const input = getDataDifference()
       if (input) mutate({ id: root.$route.params.id, input })
     }
 
