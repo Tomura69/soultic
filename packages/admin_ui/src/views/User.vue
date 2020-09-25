@@ -1,6 +1,6 @@
 <template>
-  <v-card elevation="1" class="pa-3" v-if="!queryLoading">
-    <LoadingOverlay :loading="mutationLoading" />
+  <v-card elevation="1" class="pa-3">
+    <LoadingOverlay :loading="loading" />
     <v-row cols="12">
       <v-col cols="6">
         <div class="caption grey--text">ID</div>
@@ -73,12 +73,11 @@
         {{ user.deletedAt ? $t('restore') : $t('delete') }}
       </v-btn>
     </v-col>
-    <!-- /Buttons -->
   </v-card>
 </template>
 
 <script lang="ts">
-import { defineComponent } from '@vue/composition-api'
+import { computed, defineComponent } from '@vue/composition-api'
 import { useMutation, useQuery, useResult } from '@vue/apollo-composable'
 import USER from '@/graphql/queries/USER'
 import UPDATE_USER from '@/graphql/mutations/UPDATE_USER'
@@ -111,7 +110,7 @@ export default defineComponent({
       { fetchPolicy: 'no-cache' }
     )
 
-    const user = useResult(result, null, (data) => data.user)
+    const user = useResult(result, {}, (data) => data.user)
 
     const { mutate, onDone, loading: mutationLoading } = useMutation<
       UpdateUserMutation,
@@ -148,8 +147,11 @@ export default defineComponent({
       mutate({ id: root.$route.params.id, input: { deletedAt: null } })
     }
 
+    const loading = computed(() => mutationLoading.value || queryLoading.value)
+
     return {
       user,
+      loading,
       queryLoading,
       mutationLoading,
       isDataChanged,

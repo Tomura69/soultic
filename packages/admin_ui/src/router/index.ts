@@ -41,7 +41,6 @@ const routes: Array<RouteMetaConfig> = [
     name: 'Users',
     component: Users,
     meta: {
-      rerender: true,
       breadcrumbs: [
         {
           name: i18n.t('users'),
