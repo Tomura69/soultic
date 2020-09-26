@@ -2,11 +2,9 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
-  BeforeInsert,
+  PrimaryGeneratedColumn,
 } from 'typeorm'
-import { Field, ObjectType } from 'type-graphql'
-import { Node } from './Node'
-import { getUniqueSlug } from '../utils/getUniqueSlug'
+import { Field, ID, ObjectType } from 'type-graphql'
 
 const formatDate = (date: Date | null) => {
   if (date === null) return null
@@ -21,8 +19,12 @@ const formatDate = (date: Date | null) => {
   return `${[year, month, day].join('/')} ${[hours, minutes].join(':')}`
 }
 
-@ObjectType({ implements: Node })
-export abstract class Base extends Node {
+@ObjectType()
+export abstract class Base {
+  @Field(() => ID)
+  @PrimaryGeneratedColumn()
+  id: number
+
   @Field()
   @CreateDateColumn({
     transformer: {
