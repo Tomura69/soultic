@@ -6,8 +6,10 @@ import { IsStaff } from '../middleware/global/IsStaff'
 import { BuildSchemaOptions } from 'type-graphql'
 import { AdminMeResolver } from './user/me.resolver'
 import { AdminLogoutResolver } from './user/logout.resolver'
+import { ProductResolver } from './product/product.resolver'
 
 const resolvers: BuildSchemaOptions['resolvers'] = [
+  ProductResolver,
   UserResolver,
   AdminLoginResolver,
   AdminMeResolver,

@@ -1,14 +1,13 @@
-import { Role } from './role';
+import { Role } from './role'
 
 export interface IPermission {
-  [key: string]: Role[];
+  [key: string]: Role[]
 }
-const createPermissions = <M extends IPermission>(resolver: M) => resolver;
+const createPermissions = <M extends IPermission>(resolver: M) => resolver
 
 export const Permission = createPermissions({
   updateUser: [Role.ADMIN],
-  deleteUser: [Role.ADMIN],
-  restoreUser: [Role.ADMIN],
   getUsers: [Role.ADMIN, Role.EMPLOYEE],
   getUser: [Role.ADMIN, Role.EMPLOYEE],
-});
+  createProduct: [Role.ADMIN],
+})

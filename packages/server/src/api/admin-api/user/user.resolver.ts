@@ -1,19 +1,7 @@
-// @ts-no-check
-import {
-  Resolver,
-  Query,
-  Arg,
-  Mutation,
-  Authorized,
-  ID,
-  Ctx,
-  Int,
-} from 'type-graphql'
+import { Resolver, Query, Arg, Mutation, ID, Ctx } from 'type-graphql'
 import { User } from '../../../entities/User'
-import { Role } from '../../shared/types/role'
 import { UserRepo } from '../../../repositories/UserRepo'
 import { InjectRepository } from 'typeorm-typedi-extensions'
-import { getCustomRepository } from 'typeorm'
 import { IsAuth } from '../../middleware/decorators/IsAuth'
 import { Allow } from '../../middleware/decorators/Allow'
 import { Permission } from '../../shared/types/permission'
@@ -26,7 +14,6 @@ import { ListOptions } from '../../utils/listOptions'
 import { UserFilterParameters } from './inputs/user-filter.input'
 import { UserSortParameters } from './inputs/user-sort.input'
 import { listQuery } from '../../utils/listQuery'
-import { createContext } from 'vm'
 
 const UserList = ListResponse<User>(User)
 type UserList = InstanceType<typeof UserList>

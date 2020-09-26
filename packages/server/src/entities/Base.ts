@@ -1,11 +1,12 @@
 import {
-  PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  BeforeInsert,
 } from 'typeorm'
 import { Field, ObjectType } from 'type-graphql'
 import { Node } from './Node'
+import { getUniqueSlug } from '../utils/getUniqueSlug'
 
 const formatDate = (date: Date | null) => {
   if (date === null) return null
