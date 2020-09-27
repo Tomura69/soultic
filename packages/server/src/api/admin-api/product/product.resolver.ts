@@ -1,10 +1,9 @@
-import { Resolver, Mutation, Args } from 'type-graphql'
+import { Resolver, Mutation, Args, Arg } from 'type-graphql'
 import { Product } from '../../../entities/Product'
 import { ProductRepo } from '../../../repositories/ProductRepo'
 import { InjectRepository } from 'typeorm-typedi-extensions'
 import { Allow } from '../../middleware/decorators/Allow'
 import { Permission } from '../../shared/types/permission'
-import { __ } from 'i18n'
 import { ProductInput } from './input/product.input'
 
 @Resolver()
@@ -20,5 +19,13 @@ export class ProductResolver {
   ): Promise<Product> {
     const entity = Object.assign(new Product(), data)
     return this.productRepo.save(entity)
+  }
+
+  @Mutation(() => Boolean)
+  async removeProduct(
+    @Arg('id')
+    id: number
+  ) {
+    return this.productRepo.delete({ id })
   }
 }

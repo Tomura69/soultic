@@ -4,6 +4,9 @@ import { Product } from './Product'
 
 @Entity()
 export class ProductVariant extends Base {
-  @ManyToOne(() => Product, (product) => product.variants)
+  @ManyToOne(() => Product, (product) => product.variants, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   product: Product
 }
