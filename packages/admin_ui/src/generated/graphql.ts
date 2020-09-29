@@ -18,6 +18,7 @@ export type Query = {
   users: UserList
   user?: Maybe<User>
   me: User
+  product?: Maybe<Product>
 }
 
 export type QueryUsersArgs = {
@@ -28,13 +29,18 @@ export type QueryUserArgs = {
   id: Scalars['ID']
 }
 
+export type QueryProductArgs = {
+  languageCode?: Maybe<LanguageCode>
+  id: Scalars['Float']
+}
+
 export type UserList = {
   __typename?: 'UserList'
   items: Array<User>
   totalCount: Scalars['Int']
 }
 
-export type User = Node & {
+export type User = {
   __typename?: 'User'
   id: Scalars['ID']
   createdAt: Scalars['String']
@@ -47,15 +53,10 @@ export type User = Node & {
   confirmed: Scalars['Boolean']
 }
 
-export type Node = {
-  id: Scalars['ID']
-}
-
 /** System roles */
 export enum Role {
   Admin = 'ADMIN',
   Employee = 'EMPLOYEE',
-  Customer = 'CUSTOMER',
 }
 
 export type UserListOptions = {
@@ -101,11 +102,40 @@ export enum SortOperators {
   Desc = 'DESC',
 }
 
+export type Product = {
+  __typename?: 'Product'
+  id: Scalars['ID']
+  createdAt: Scalars['String']
+  updatedAt: Scalars['String']
+  deletedAt?: Maybe<Scalars['String']>
+  translations: Array<ProductTranslation>
+}
+
+export type ProductTranslation = {
+  __typename?: 'ProductTranslation'
+  id: Scalars['ID']
+  createdAt: Scalars['String']
+  updatedAt: Scalars['String']
+  deletedAt?: Maybe<Scalars['String']>
+  languageCode: LanguageCode
+  title: Scalars['String']
+  slug: Scalars['String']
+}
+
+/** Available language codes */
+export enum LanguageCode {
+  Lt = 'lt',
+  En = 'en',
+}
+
 export type Mutation = {
   __typename?: 'Mutation'
   updateUser: Scalars['Boolean']
-  login?: Maybe<Scalars['Boolean']>
+  login?: Maybe<User>
   logout: Scalars['Boolean']
+  createProduct: Product
+  addProductTranslation: ProductTranslation
+  removeProduct: Scalars['Boolean']
 }
 
 export type MutationUpdateUserArgs = {
@@ -115,6 +145,20 @@ export type MutationUpdateUserArgs = {
 
 export type MutationLoginArgs = {
   input: LoginInput
+}
+
+export type MutationCreateProductArgs = {
+  title: Scalars['String']
+}
+
+export type MutationAddProductTranslationArgs = {
+  languageCode: Scalars['String']
+  title: Scalars['String']
+  id: Scalars['Float']
+}
+
+export type MutationRemoveProductArgs = {
+  id: Scalars['Float']
 }
 
 export type UserUpdateInput = {
@@ -133,10 +177,14 @@ export type AdminLoginMutationVariables = Exact<{
   password: Scalars['String']
 }>
 
-export type AdminLoginMutation = { __typename?: 'Mutation' } & Pick<
-  Mutation,
-  'login'
->
+export type AdminLoginMutation = { __typename?: 'Mutation' } & {
+  login?: Maybe<
+    { __typename?: 'User' } & Pick<
+      User,
+      'id' | 'email' | 'firstname' | 'lastname'
+    >
+  >
+}
 
 export type AdminLogoutMutationVariables = Exact<{ [key: string]: never }>
 

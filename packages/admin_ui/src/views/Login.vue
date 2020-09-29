@@ -37,8 +37,8 @@
             color="secondary"
             type="submit"
             form="login-form"
-            :loading="loading"
-            :disabled="loading"
+            :loading="loginLoading"
+            :disabled="loginLoading"
             class="px-2"
           >
             {{ $t('login') }}
@@ -50,7 +50,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from '@vue/composition-api'
+import { defineComponent, ref } from '@vue/composition-api'
 import useAuth from '@/modules/useAuth'
 import useMe from '@/modules/useMe'
 import useToast from '@/modules/useToast'
@@ -68,11 +68,11 @@ export default defineComponent({
       loading: loginLoading,
     } = useAuth().login
 
-    const { getMe, meLoading } = useMe()
+    const { setMe } = useMe()
 
     onLogin(async (result) => {
       if (result && result.data && result.data.login) {
-        await getMe()
+        setMe(result.data.login)
 
         addToast({ type: 'success', message: root.$t('login-success') })
         root.$router.push({ path: '/' })
@@ -83,9 +83,7 @@ export default defineComponent({
       }
     })
 
-    const loading = computed(() => meLoading.value || loginLoading.value)
-
-    return { email, password, login, loading }
+    return { email, password, login, loginLoading }
   },
 })
 </script>
