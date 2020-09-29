@@ -13,6 +13,7 @@
   "error.must-login": "Pirmiausia reikia prisijungti",
   "error.access-denied": "Jūs neturite tam teisių",
   "error.user-doesnt-exist": "Toks vartotojas neegzistuoja",
+  "error.invalid-login": "Neteisingas El. paštas arba slaptažodis",
   "error.user-is-deleted": "Šis vartotojas yra ištrintas",
   "error.confirm-email": "Jūs privalote patvirtinti savo el. pašto adresą",
   "error.invalid-token": "Negaliojantis raktas",
