@@ -1,0 +1,17 @@
+import { Field, InputType } from 'type-graphql'
+import { SortOperators } from '../operators/sort-operators.input'
+
+@InputType()
+export class ProductSortParameters {
+  @Field(() => SortOperators, { nullable: true })
+  id?: SortOperators
+
+  @Field(() => SortOperators, { nullable: true })
+  createdAt?: SortOperators
+
+  @Field(() => SortOperators, { nullable: true })
+  updatedAt?: SortOperators
+
+  @Field(() => SortOperators, { nullable: true })
+  deletedAt?: SortOperators
+}

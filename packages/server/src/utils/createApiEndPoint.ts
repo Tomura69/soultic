@@ -1,7 +1,7 @@
 import 'dotenv'
 import { ApolloServer, CorsOptions } from 'apollo-server-express'
 import { MyContext } from '../types/MyContext'
-import { User } from '../entities/User'
+import { User } from '../entities/user/user.entity'
 import { GraphQLSchema } from 'graphql'
 import { Application } from 'express'
 import session, { SessionOptions } from 'express-session'

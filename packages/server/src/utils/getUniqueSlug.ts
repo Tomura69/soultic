@@ -24,7 +24,7 @@ async function getUniqueSlug<T extends { slug: string }>(
   let count = 1
 
   for (let num of numArray) {
-    if (num !== --count) return `${slug}${count ? count : ''}`
+    if (num !== --count) return `${slug}${count || ''}`
   }
 
   return `${slug}${--count}`

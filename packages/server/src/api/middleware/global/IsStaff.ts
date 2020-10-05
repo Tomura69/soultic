@@ -2,7 +2,7 @@ import { MiddlewareFn } from 'type-graphql'
 import { __ } from 'i18n'
 import { AppError } from '../../../utils/AppError'
 import { MyContext } from '../../../types/MyContext'
-import { staff } from '../../shared/types/staff'
+import { staff } from '../../types/staff'
 
 export const IsStaff: MiddlewareFn<MyContext> = async (
   { context, args, info },

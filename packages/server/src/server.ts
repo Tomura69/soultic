@@ -7,13 +7,15 @@ import * as classValidator from 'class-validator'
 import i18n from 'i18n'
 import { createConnection } from 'typeorm'
 import { Container } from 'typedi'
-import { SessionRepo } from './repositories/SessionRepo'
 import { TypeormStore } from './lib/session/TypeormStore'
 import { createApiEndPoint } from './utils/createApiEndPoint'
 import { confirmEmail } from './lib/email/confirmEmail'
 import { __prod__ } from './constants/prod'
-import { shopSchema } from './api/shop-api/schema'
-import { adminSchema } from './api/admin-api/schema'
+import { shopSchema } from './api/schema/shop-api.schema'
+import { adminSchema } from './api/schema/admin-api.schema'
+import { Session } from './entities/session/session.entity'
+import { LanguageCode } from './api/types/languageCode'
+import { DEFAULT_LANGUAGE_CODE } from './constants/DEFAULT_LANGUAGE_CODE'
 
 // Enviroment
 dotenv.config()
@@ -47,8 +49,8 @@ const main = async () => {
    */
 
   i18n.configure({
-    locales: ['en', 'lt'],
-    defaultLocale: 'lt',
+    locales: Object.values(LanguageCode),
+    defaultLocale: DEFAULT_LANGUAGE_CODE,
     cookie: 'locale',
     directory: __dirname + './../locales',
   })
@@ -60,7 +62,7 @@ const main = async () => {
    */
   const SESSION_SECRET = process.env.SESSION_SECRET!
   const SESSION_TTL = 1000 * 60 * 60 * 24 * +process.env.SESSION_TTL!
-  const repository = typeorm.getCustomRepository(SessionRepo)
+  const repository = typeorm.getRepository(Session)
 
   app.get(`${process.env.REGISTER_CONFIRM_URL!}/:id`, confirmEmail)
 

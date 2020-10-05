@@ -1,74 +1,74 @@
-import { LessThan, Repository } from 'typeorm';
-import { Store } from 'express-session';
-import { User } from '../../entities/User';
+import { LessThan, Repository } from 'typeorm'
+import { Store } from 'express-session'
+import { User } from '../../entities/user/user.entity'
 
 export interface SessionEntity {
   /**
    * The randomly generated session ID.
    */
-  id: string;
+  id: string
 
   /**
    * The UNIX timestamp at which the session will expire.
    */
-  expiresAt: Date;
+  expiresAt: Date
 
   /**
    * The JSON data of the session.
    */
-  data: string;
+  data: string
   /**
    * The userId that assigned to session
    */
-  userId: number | null;
+  userId: number | null
   /**
    * The user that assigned to session
    */
-  user: User;
+  user: User
   /**
    * The order that assigned to session
    */
-  activeOrderId?: number;
+  activeOrderId?: number
 }
 
 export interface Options {
-  repository: Repository<SessionEntity>;
+  repository: Repository<SessionEntity>
 
   /**
    * Session TTL in miliseconds. Defaults to 86400000 (1 day).
    */
-  ttl?: number;
+  ttl?: number
 
   /**
    * Whether to remove expired sessions from the database. Defaults to true.
    */
-  clearExpired?: boolean;
+  clearExpired?: boolean
 
   /**
    * The interval between checking for expired sessions in miliseconds. Defaults to 86400000 (1 day).
    */
-  expirationInterval?: number;
+  expirationInterval?: number
 }
 
 export class TypeormStore extends Store {
-  private readonly repository: Repository<SessionEntity>;
-  private readonly ttl?: number;
-  private readonly expirationInterval: number;
-  private expirationIntervalId?: number;
+  private readonly repository: Repository<SessionEntity>
+  private readonly ttl?: number
+  private readonly expirationInterval: number
+  private expirationIntervalId?: number
 
   constructor(options: Options) {
-    super(options);
+    super(options)
 
     if (!options.repository) {
-      throw new Error('The repository option is required');
+      throw new Error('The repository option is required')
     }
 
-    this.repository = options.repository;
-    this.ttl = options.ttl;
-    this.expirationInterval = options.expirationInterval || 86400000;
+    this.repository = options.repository
+    this.ttl = options.ttl
+    this.expirationInterval = options.expirationInterval || 86400000
 
     if (options.clearExpired === undefined || options.clearExpired) {
-      this.setExpirationInterval(this.expirationInterval);
+      this.setExpirationInterval(this.expirationInterval)
     }
   }
 
@@ -81,12 +81,12 @@ export class TypeormStore extends Store {
       .find()
       .then((sessions: SessionEntity[]) =>
         sessions.map((session) => {
-          return { ...session, ...JSON.parse(session.data) };
+          return { ...session, ...JSON.parse(session.data) }
         })
       )
       .then((data: any) => callback(null, data))
-      .catch((error: any) => callback(error));
-  };
+      .catch((error: any) => callback(error))
+  }
 
   /**
    * Destroy a session
@@ -97,8 +97,8 @@ export class TypeormStore extends Store {
     this.repository
       .delete(id)
       .then(() => callback && callback(null))
-      .catch((error: any) => callback && callback(error));
-  };
+      .catch((error: any) => callback && callback(error))
+  }
 
   /**
    * Clear all sessions.
@@ -108,8 +108,8 @@ export class TypeormStore extends Store {
     this.repository
       .clear()
       .then(() => callback && callback(null))
-      .catch((error: any) => callback && callback(error));
-  };
+      .catch((error: any) => callback && callback(error))
+  }
 
   /**
    * Get the session count.
@@ -119,8 +119,8 @@ export class TypeormStore extends Store {
     this.repository
       .count()
       .then((length: number) => callback(null, length))
-      .catch((error: any) => callback(error, 0));
-  };
+      .catch((error: any) => callback(error, 0))
+  }
 
   /**
    * Get a session.
@@ -136,12 +136,12 @@ export class TypeormStore extends Store {
       .getOne()
       .then((session: SessionEntity | undefined) => {
         if (!session) {
-          return callback(null);
+          return callback(null)
         }
-        callback(null, { ...session, ...JSON.parse(session.data) });
+        callback(null, { ...session, ...JSON.parse(session.data) })
       })
-      .catch((error: any) => callback(error));
-  };
+      .catch((error: any) => callback(error))
+  }
 
   /**
    * Set a session.
@@ -150,26 +150,26 @@ export class TypeormStore extends Store {
    * @param {(error: any) => void} callback
    */
   set = (id: string, session: any, callback?: (error: any) => void): void => {
-    let data;
+    let data
     try {
-      data = JSON.stringify({ cookie: session.cookie });
+      data = JSON.stringify({ cookie: session.cookie })
     } catch (error) {
       if (callback) {
-        return callback(error);
+        return callback(error)
       }
-      throw error;
+      throw error
     }
 
-    const activeOrderId: number = session.activeOrderId;
-    const userId: number = session.userId;
-    const ttl = this.getTTL(session);
-    const expiresAt = new Date(Date.now() + ttl);
+    const activeOrderId: number = session.activeOrderId
+    const userId: number = session.userId
+    const ttl = this.getTTL(session)
+    const expiresAt = new Date(Date.now() + ttl)
 
     this.repository
       .save({ id, data, userId, activeOrderId, expiresAt })
       .then(() => callback && callback(null))
-      .catch((error: any) => callback && callback(error));
-  };
+      .catch((error: any) => callback && callback(error))
+  }
 
   /**
    * Refresh the session expiry time.
@@ -178,52 +178,49 @@ export class TypeormStore extends Store {
    * @param {(error: any) => void} callback
    */
   touch = (id: string, session: any, callback?: (error: any) => void): void => {
-    const ttl = this.getTTL(session);
-    const expiresAt = new Date(Date.now() + ttl);
+    const ttl = this.getTTL(session)
+    const expiresAt = new Date(Date.now() + ttl)
 
     this.repository
       .update(id, { expiresAt })
       .then(() => callback && callback(null))
-      .catch((error: any) => callback && callback(error));
-  };
+      .catch((error: any) => callback && callback(error))
+  }
 
   /**
    * Remove all expired sessions from the database.
    * @param {(error: any) => void} callback
    */
   clearExpiredSessions = (callback?: (error: any) => void) => {
-    const timestamp = new Date();
+    const timestamp = new Date()
 
     this.repository
       .delete({ expiresAt: LessThan(timestamp) })
       .then(() => callback && callback(null))
-      .catch((error: any) => callback && callback(error));
-  };
+      .catch((error: any) => callback && callback(error))
+  }
 
   /**
    * Set the expiration interval in seconds. If the interval in seconds is not set, it defaults to the store's expiration interval.
    * @param {number} interval
    */
   setExpirationInterval = (interval?: number) => {
-    interval = interval || this.expirationInterval;
+    interval = interval || this.expirationInterval
 
-    this.clearExpirationInterval();
-    this.expirationIntervalId = setInterval(
-      this.clearExpiredSessions,
-      interval
-    );
-  };
+    this.clearExpirationInterval()
+    this.expirationIntervalId = setInterval(this.clearExpiredSessions, interval)
+  }
 
   /**
    * Clear the expiration interval if it exists.
    */
   clearExpirationInterval = () => {
     if (this.expirationIntervalId) {
-      clearInterval(this.expirationIntervalId);
+      clearInterval(this.expirationIntervalId)
     }
 
-    this.expirationIntervalId = undefined;
-  };
+    this.expirationIntervalId = undefined
+  }
 
   /**
    * Get the session TTL (time to live) in seconds.
@@ -232,10 +229,10 @@ export class TypeormStore extends Store {
    */
   private getTTL = (session: any): number => {
     if (this.ttl) {
-      return this.ttl;
+      return this.ttl
     }
     return session.cookie && session.cookie.maxAge
       ? Math.floor(session.cookie.maxAge)
-      : 86400000;
-  };
+      : 86400000
+  }
 }
