@@ -1,7 +1,7 @@
 import { InputType, Field } from 'type-graphql'
 import { __ } from 'i18n'
 
-import { UserDetailsInput } from '../../inputs/user/userdetails.input'
+import { UserDetailsInput } from './user-details.input'
 
 @InputType()
 export class RegisterInput extends UserDetailsInput {

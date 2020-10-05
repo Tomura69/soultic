@@ -1,4 +1,4 @@
-import { Resolver, Mutation, Arg, Query } from 'type-graphql'
+import { Resolver, Mutation, Arg, Query, Int } from 'type-graphql'
 import { Product } from '../../../entities/product/product.entity'
 import { Allow } from '../../middleware/decorators/Allow'
 import { Permission } from '../../types/permission'
@@ -11,11 +11,16 @@ import {
   ProductListOptions,
   ProductService,
 } from '../../../service/services/product.service'
+import { ProductTranslationService } from '../../../service/services/product-translation.service'
+import { ProductTranslationUpdateInput } from '../../inputs/product/product-translation-update.input'
 
 @Resolver(() => Product)
 export class AdminProductResolver {
   @Inject()
   private readonly productService: ProductService
+
+  @Inject()
+  private readonly productTranslationService: ProductTranslationService
 
   @Allow(Permission.createProduct)
   @Mutation(() => Product)
@@ -28,23 +33,28 @@ export class AdminProductResolver {
 
   @Mutation(() => ProductTranslation)
   async addProductTranslation(
-    @Arg('id') id: number,
+    @Arg('id', () => Int) id: number,
     @Arg('input') input: ProductTranslationInput
   ) {
-    return this.productService.addTranslation(id, input)
+    return this.productTranslationService.create(id, input)
   }
 
   @Mutation(() => ProductTranslation)
   async updateProductTranslation(
-    @Arg('id') id: number,
-    @Arg('input') input: ProductTranslationInput
+    @Arg('id', () => Int) id: number,
+    @Arg('input') input: ProductTranslationUpdateInput
   ) {
-    return this.productService.updateTranslation(id, input)
+    return this.productTranslationService.update(id, input)
+  }
+
+  @Mutation(() => Boolean)
+  async deleteProductTranslation(@Arg('id', () => Int) id: number) {
+    return this.productTranslationService.delete(id)
   }
 
   @Mutation(() => Boolean)
   async removeProduct(
-    @Arg('id')
+    @Arg('id', () => Int)
     id: number
   ) {
     return this.productService.delete({ id })

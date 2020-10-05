@@ -30,26 +30,12 @@ export type ProductListOptions = InstanceType<typeof ProductListOptions>
 export class ProductService {
   private readonly productRepo = getRepository(Product)
 
-  private readonly productTranslationRepo = getRepository(ProductTranslation)
-
   async create(input: ProductInput) {
     if (!input.languageCode) input.languageCode = getLocale() as LanguageCode
     const translation = Object.assign(new ProductTranslation(), input)
     const entity = Object.assign(new Product(), { translations: [translation] })
     const product = await this.productRepo.save(entity)
     return translateEntity(product, input.languageCode)
-  }
-
-  async addTranslation(id: number, input: ProductTranslationInput) {
-    const translation = Object.assign(new ProductTranslation(), {
-      base: id,
-      ...input,
-    })
-    return this.productTranslationRepo.save(translation)
-  }
-
-  async updateTranslation(id: number, input: ProductTranslationInput) {
-    return this.productTranslationRepo.save({ id, ...input })
   }
 
   async delete(conditions: FindConditions<Product>) {
@@ -71,17 +57,13 @@ export class ProductService {
     slug: string,
     findOptions: FindManyOptions = { withDeleted: true }
   ) {
-    const product = await this.productTranslationRepo
+    const translation = await getRepository(ProductTranslation)
       .createQueryBuilder('translation')
       .where('slug = :slug', { slug })
       .getRawOne()
-    if (!product) return
+    if (!translation) return
 
-    return this.findOne(
-      product.translation_baseId,
-      product.translation_languageCode,
-      findOptions
-    )
+    return this.findOne(translation.translation_baseId, undefined, findOptions)
   }
 
   async findAll(options: ProductListOptions, languageCode?: LanguageCode) {

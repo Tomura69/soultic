@@ -1,5 +1,5 @@
 import { InputType, Field } from 'type-graphql'
-import { UserDetailsInput } from './userdetails.input'
+import { UserDetailsInput } from './user-details.input'
 
 @InputType()
 export class MeInput extends UserDetailsInput {
