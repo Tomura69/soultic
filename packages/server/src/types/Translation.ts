@@ -22,3 +22,7 @@ export type Translatable = {
 export type Translated<T> = T & {
   languageCode: LanguageCode
 } & { [K in TranslatableRelationsKeys<T>]: string }
+
+export type TranslationInput<T> = {
+  [K in TranslatableKeys<T>]: string
+}

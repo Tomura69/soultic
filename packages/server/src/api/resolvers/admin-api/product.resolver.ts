@@ -13,6 +13,9 @@ import {
 } from '../../../service/services/product.service'
 import { ProductTranslationService } from '../../../service/services/product-translation.service'
 import { ProductTranslationUpdateInput } from '../../inputs/product/product-translation-update.input'
+import { ProductVariantService } from '../../../service/services/product-variant.service'
+import { ProductVariant } from '../../../entities/product/product-variant.entity'
+import { ProductVariantInput } from '../../inputs/product/product-variant.input'
 
 @Resolver(() => Product)
 export class AdminProductResolver {
@@ -21,6 +24,9 @@ export class AdminProductResolver {
 
   @Inject()
   private readonly productTranslationService: ProductTranslationService
+
+  @Inject()
+  private readonly productVariantService: ProductVariantService
 
   @Allow(Permission.createProduct)
   @Mutation(() => Product)
@@ -37,6 +43,22 @@ export class AdminProductResolver {
     @Arg('input') input: ProductTranslationInput
   ) {
     return this.productTranslationService.create(id, input)
+  }
+
+  @Mutation(() => ProductVariant)
+  async addProductVariant(
+    @Arg('id', () => Int) id: number,
+    @Arg('input') input: ProductVariantInput
+  ) {
+    return this.productVariantService.create(id, input)
+  }
+
+  @Mutation(() => ProductVariant)
+  async updateProductVariant(
+    @Arg('id', () => Int) id: number,
+    @Arg('input') input: ProductVariantInput
+  ) {
+    return this.productVariantService.update(id, input)
   }
 
   @Mutation(() => ProductTranslation)

@@ -11,7 +11,8 @@ import { LanguageCode } from '../../api/types/languageCode'
 export class Product
   extends Base
   implements Translatable, Omit<ProductTranslation, 'base' | 'generateSlug'> {
-  @OneToMany(() => ProductVariant, (variant) => variant.product)
+  @Field(() => [ProductVariant])
+  @OneToMany(() => ProductVariant, (variant) => variant.base, { eager: true })
   variants: ProductVariant[]
 
   @Field(() => [ProductTranslation])

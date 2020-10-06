@@ -7,6 +7,7 @@ import * as classValidator from 'class-validator'
 import i18n from 'i18n'
 import { createConnection } from 'typeorm'
 import { Container } from 'typedi'
+
 import { TypeormStore } from './lib/session/TypeormStore'
 import { createApiEndPoint } from './utils/createApiEndPoint'
 import { confirmEmail } from './lib/email/confirmEmail'
