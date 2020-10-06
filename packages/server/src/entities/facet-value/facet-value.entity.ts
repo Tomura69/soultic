@@ -23,6 +23,7 @@ export class FacetValue extends Base implements Translatable {
   })
   base: Facet
 
+  @Field(() => [FacetValueTranslation])
   @OneToMany(() => FacetValueTranslation, (translation) => translation.base, {
     eager: true,
     cascade: ['insert'],

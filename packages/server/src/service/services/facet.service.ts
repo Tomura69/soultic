@@ -23,10 +23,8 @@ export class FacetService {
   }
 
   async findAll() {
-    return this.facetRepo.find().then((facets) => {
-      const temp = facets.map((facet) => translateEntity(facet))
-      console.log(temp)
-      return temp
-    })
+    return this.facetRepo
+      .find()
+      .then((facets) => facets.map((facet) => translateEntity(facet)))
   }
 }

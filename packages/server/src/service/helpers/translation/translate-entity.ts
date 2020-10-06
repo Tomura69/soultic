@@ -25,7 +25,7 @@ export const translateEntity = <Entity extends Translatable>(
   Object.setPrototypeOf(translated, Object.getPrototypeOf(entity))
 
   for (const [key, value] of Object.entries(translation || {})) {
-    if ((key !== 'base' && !(key in Base)) || key === 'name') {
+    if (key !== 'base' && key !== 'id') {
       translated[key] = value
     }
   }

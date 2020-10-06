@@ -21,7 +21,7 @@ export class Facet extends Base implements Translatable {
   @Field()
   name: string
 
-  @Field(() => [FacetValue])
+  @Field(() => [FacetValue], { nullable: true })
   @OneToMany(() => FacetValue, (value) => value.base)
   values: FacetValue[]
 
