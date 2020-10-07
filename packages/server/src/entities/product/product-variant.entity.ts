@@ -37,7 +37,7 @@ export class ProductVariant extends Base {
   sku: string
 
   @Field(() => [FacetValue])
-  @ManyToMany(() => FacetValue, { cascade: ['insert', 'remove'] })
+  @ManyToMany(() => FacetValue, { cascade: ['remove', 'update'] })
   @JoinTable()
   facetValues: FacetValue[]
 

@@ -5,9 +5,11 @@ import { IsStaff } from '../middleware/global/IsStaff'
 import { BuildSchemaOptions } from 'type-graphql'
 import { AdminProductResolver } from '../resolvers/admin-api/product.resolver'
 import { FacetResolver } from '../resolvers/admin-api/facet-resolver'
+import { AdminProductVariantResolver } from '../resolvers/admin-api/product-variant.resolver'
 
 const resolvers: BuildSchemaOptions['resolvers'] = [
   AdminProductResolver,
+  AdminProductVariantResolver,
   AdminUserResolver,
   FacetResolver,
 ]

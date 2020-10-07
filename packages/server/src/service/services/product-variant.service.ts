@@ -19,17 +19,13 @@ export class ProductVariantService {
     return this.productVariantRepo.findOne(input)
   }
 
-  async update(id: number, input: ProductVariantInput) {
-    const newInput: DeepPartial<ProductVariant> = {
+  async update(id: number, { facetValues, ...input }: ProductVariantInput) {
+    return this.productVariantRepo.save({
+      id,
       ...input,
-      facetValues: input.facetValues.map((id) =>
-        Object.assign(new FacetValue(), { id })
+      facetValues: facetValues.map((valueId) =>
+        Object.assign(new FacetValue(), { id: valueId })
       ),
-    }
-
-    const result = await this.productVariantRepo.update({ id }, {})
-    if (!result.affected) return
-
-    return this.findOne(newInput)
+    })
   }
 }
