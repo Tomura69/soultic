@@ -17,6 +17,7 @@ export class FacetValue extends Base implements Translatable {
   @Field()
   name: string
 
+  @Field(() => Facet, { name: 'facet' })
   @ManyToOne(() => Facet, (facet) => facet.values, {
     onDelete: 'CASCADE',
     cascade: true,

@@ -24,9 +24,49 @@ export const translateEntity = <Entity extends Translatable>(
   const translated = { ...(entity as any) }
   Object.setPrototypeOf(translated, Object.getPrototypeOf(entity))
 
-  for (const [key, value] of Object.entries(translation || {})) {
+  for (const [key, value] of Object.entries(translation)) {
     if (key !== 'base' && key !== 'id') {
       translated[key] = value
+    }
+  }
+
+  return translated
+}
+
+// Translates entity, and entity's nested fields(relations)
+export const translateDeep = <Entity extends Translatable>(
+  entity: Entity,
+  languageCode: LanguageCode = getLocale() as LanguageCode,
+  maxDeep = 2,
+  deepness = 0
+) => {
+  if (deepness > maxDeep) return entity
+
+  let translated
+
+  try {
+    translated = translateEntity(entity, languageCode)
+  } catch {
+    translated = { ...(entity as any) }
+  }
+
+  for (const [key, value] of Object.entries(entity)) {
+    if (value instanceof Base) {
+      translated[key] = translateDeep(
+        value as never,
+        languageCode,
+        maxDeep,
+        deepness + 1
+      )
+    } else if (
+      Array.isArray(value) &&
+      value.every(
+        (val: any) => val.translations !== undefined && val instanceof Base
+      )
+    ) {
+      translated[key] = value.map((val) =>
+        translateDeep(val as never, languageCode, maxDeep, deepness + 1)
+      )
     }
   }
 

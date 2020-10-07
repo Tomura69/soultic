@@ -1,5 +1,10 @@
 import { Service } from 'typedi'
-import { FindConditions, FindOneOptions, getRepository } from 'typeorm'
+import {
+  FindConditions,
+  FindManyOptions,
+  FindOneOptions,
+  getRepository,
+} from 'typeorm'
 
 import { FacetValueTranslationInput } from '../../api/inputs/facet-value/facet-value-translation'
 import { FacetValueInput } from '../../api/inputs/facet-value/facet-value.input'
@@ -30,9 +35,9 @@ export class FacetValueService {
     })
   }
 
-  async findAll(conditions: FindConditions<FacetValue>) {
+  async findAll(options: FindManyOptions<FacetValue>) {
     return this.facetValueRepo
-      .find(conditions)
+      .find(options)
       .then((facetValues) => facetValues.map((value) => translateEntity(value)))
   }
 

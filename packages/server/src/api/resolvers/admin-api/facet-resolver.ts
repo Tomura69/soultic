@@ -1,12 +1,4 @@
-import {
-  Arg,
-  FieldResolver,
-  Int,
-  Mutation,
-  Query,
-  Resolver,
-  Root,
-} from 'type-graphql'
+import { Arg, Int, Mutation, Query, Resolver } from 'type-graphql'
 import { Inject } from 'typedi'
 
 import { FacetTranslation } from '../../../entities/facet/facet-translation.entity'
@@ -19,7 +11,7 @@ import { FacetValueTranslationInput } from '../../inputs/facet-value/facet-value
 import { FacetValueInput } from '../../inputs/facet-value/facet-value.input'
 import { FacetInput } from '../../inputs/facet/facet.input'
 
-@Resolver(() => Facet)
+@Resolver()
 export class FacetResolver {
   @Inject()
   private readonly facetService: FacetService
@@ -59,11 +51,5 @@ export class FacetResolver {
   @Query(() => [Facet])
   facets() {
     return this.facetService.findAll()
-  }
-
-  // TODO: Attach data loader
-  @FieldResolver()
-  async values(@Root() facet: Facet) {
-    return this.facetValueService.findAll({ base: { id: facet.id } })
   }
 }

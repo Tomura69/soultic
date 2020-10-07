@@ -6,12 +6,14 @@ import { BuildSchemaOptions } from 'type-graphql'
 import { AdminProductResolver } from '../resolvers/admin-api/product.resolver'
 import { FacetResolver } from '../resolvers/admin-api/facet-resolver'
 import { AdminProductVariantResolver } from '../resolvers/admin-api/product-variant.resolver'
+import EntitiesResolvers from './entities-resolvers'
 
 const resolvers: BuildSchemaOptions['resolvers'] = [
   AdminProductResolver,
   AdminProductVariantResolver,
   AdminUserResolver,
   FacetResolver,
+  ...EntitiesResolvers,
 ]
 const globalMiddleware = [ErrorInterceptor, IsStaff]
 

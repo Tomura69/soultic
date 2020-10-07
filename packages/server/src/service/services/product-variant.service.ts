@@ -1,8 +1,17 @@
-import { DeepPartial, getRepository } from 'typeorm'
+import {
+  DeepPartial,
+  FindConditions,
+  FindManyOptions,
+  getRepository,
+} from 'typeorm'
 
 import { ProductVariantInput } from '../../api/inputs/product/product-variant.input'
 import { FacetValue } from '../../entities/facet-value/facet-value.entity'
 import { ProductVariant } from '../../entities/product/product-variant.entity'
+import {
+  translateDeep,
+  translateEntity,
+} from '../helpers/translation/translate-entity'
 
 export class ProductVariantService {
   private readonly productVariantRepo = getRepository(ProductVariant)
@@ -13,6 +22,10 @@ export class ProductVariantService {
       ...input,
     })
     return this.productVariantRepo.save(variant)
+  }
+
+  findAll(options: FindManyOptions<ProductVariant>) {
+    return this.productVariantRepo.find(options)
   }
 
   findOne(input: DeepPartial<ProductVariant>) {
@@ -27,5 +40,16 @@ export class ProductVariantService {
         Object.assign(new FacetValue(), { id: valueId })
       ),
     })
+  }
+
+  async getFacetValues(productVariantId: number) {
+    return this.productVariantRepo
+      .findOne({
+        where: { id: productVariantId },
+        relations: ['facetValues', 'facetValues.base'],
+      })
+      .then((variant) =>
+        !variant ? [] : variant.facetValues.map((value) => translateDeep(value))
+      )
   }
 }
