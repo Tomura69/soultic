@@ -32,6 +32,16 @@ export class AdminProductResolver {
     return this.productService.create(input)
   }
 
+  @Mutation(() => Boolean)
+  async deleteProduct(@Arg('id', () => Int) id: number) {
+    return this.productService.delete({ id })
+  }
+
+  @Mutation(() => Boolean)
+  async restoreProduct(@Arg('id', () => Int) id: number) {
+    return this.productService.restore({ id })
+  }
+
   @Mutation(() => ProductTranslation)
   async addProductTranslation(
     @Arg('id', () => Int) id: number,

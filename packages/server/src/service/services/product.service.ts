@@ -10,12 +10,14 @@ import {
 import { ProductInput } from '../../api/inputs/product/product-details.input'
 import { ProductFilterParameters } from '../../api/inputs/product/product-filter.input'
 import { ProductSortParameters } from '../../api/inputs/product/product-sort.input'
-import { ProductTranslationInput } from '../../api/inputs/product/product-translation.input'
 import { LanguageCode } from '../../api/types/languageCode'
 import { listQuery } from '../helpers/list-query/list-query'
 import { Product } from '../../entities/product/product.entity'
 import { ProductTranslation } from '../../entities/product/product-translation.entity'
-import { translateEntity } from '../helpers/translation/translate-entity'
+import {
+  translateDeep,
+  translateEntity,
+} from '../helpers/translation/translate-entity'
 import { createList } from '../helpers/utils/createList'
 
 export const {
@@ -39,7 +41,10 @@ export class ProductService {
   }
 
   async delete(conditions: FindConditions<Product>) {
-    return this.productRepo.delete(conditions)
+    return !!(await this.productRepo.softDelete(conditions)).affected
+  }
+  async restore(conditions: FindConditions<Product>) {
+    return !!(await this.productRepo.restore(conditions)).affected
   }
 
   async findOne(
@@ -72,7 +77,7 @@ export class ProductService {
       .then(([products, totalCount]) => {
         return {
           items: products.map((product) =>
-            translateEntity(product, languageCode)
+            translateDeep(product, languageCode)
           ),
           totalCount,
         }

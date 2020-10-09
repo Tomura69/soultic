@@ -1,10 +1,5 @@
 import { Service } from 'typedi'
-import {
-  FindConditions,
-  FindManyOptions,
-  FindOneOptions,
-  getRepository,
-} from 'typeorm'
+import { FindManyOptions, FindOneOptions, getRepository } from 'typeorm'
 
 import { FacetValueTranslationInput } from '../../api/inputs/facet-value/facet-value-translation'
 import { FacetValueInput } from '../../api/inputs/facet-value/facet-value.input'

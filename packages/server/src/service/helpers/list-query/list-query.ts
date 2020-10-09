@@ -29,13 +29,13 @@ type ExtendedListQueryOptions = {
 
 type WhereCondition = {
   clause: string
-  parameters: { [param: string]: string | number }
+  parameters: { [param: string]: string | string[] | number }
 }
 
 export const listQuery = <T extends Base>(
   entity: IEntity<T>,
   options: ListQueryOptions<T>,
-  extendedOptions: ExtendedListQueryOptions = {}
+  extendedOptions: ExtendedListQueryOptions = { withDeleted: true }
 ) => {
   const filters = parseFilters(entity, options.filter)
 
@@ -82,6 +82,24 @@ const parseFilters = <T extends Base>(
           }
         }
 
+        // Filter where translation is missing
+        if (key === 'languageCode') {
+          if (operator === 'in' || operator === 'nin') {
+            const condition = buildWhereCondition(
+              `${alias}.id`,
+              operator,
+              `select "id" from ${alias}
+              where "id" not in (select "baseId" from product_translation
+              group by "baseId"
+              having not array_agg("languageCode") && array[${value
+                .map((val: string) => `'${val}'`)
+                .join(',')}]::varchar[])`,
+              argIndex
+            )
+            filters.push(condition)
+          }
+        }
+
         const condition = buildWhereCondition(
           fieldName,
           operator,
@@ -104,6 +122,34 @@ const buildWhereCondition = (
   argIndex: number
 ): WhereCondition => {
   switch (operator) {
+    case 'nin':
+      // SubQuery
+      if (!Array.isArray(value))
+        return {
+          clause: `${fieldName} NOT IN (${value})`,
+          parameters: {},
+        }
+      if (value.length)
+        return {
+          clause: `${fieldName} NOT IN (${value
+            .map((val) => (typeof val === 'string' ? `'${val}'` : val))
+            .join(',')})`,
+          parameters: {},
+        }
+    case 'in':
+      // SubQuery
+      if (!Array.isArray(value))
+        return {
+          clause: `${fieldName} IN (${value})`,
+          parameters: {},
+        }
+      if (value.length)
+        return {
+          clause: `${fieldName} IN (${value.map((val) =>
+            typeof val === 'string' ? `'${val}'` : val
+          )})`,
+          parameters: {},
+        }
     case 'eq':
       if (value === null)
         return {

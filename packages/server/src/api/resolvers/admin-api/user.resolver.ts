@@ -1,6 +1,6 @@
 import { __ } from 'i18n'
 import { Inject } from 'typedi'
-import { Resolver, Query, Arg, Mutation, Ctx } from 'type-graphql'
+import { Resolver, Query, Arg, Mutation, Ctx, Int } from 'type-graphql'
 
 import { User } from '../../../entities/user/user.entity'
 import { Allow } from '../../middleware/decorators/Allow'
@@ -28,14 +28,14 @@ export class AdminUserResolver {
 
   @Allow(Permission.getUser)
   @Query(() => User, { nullable: true })
-  async user(@Arg('id') id: number): Promise<User | undefined> {
+  async user(@Arg('id', () => Int) id: number): Promise<User | undefined> {
     return this.userService.findOne({ id }, { withDeleted: true })
   }
 
   @Allow(Permission.updateUser)
   @Mutation(() => User, { nullable: true })
   async updateUser(
-    @Arg('id') id: number,
+    @Arg('id', () => Int) id: number,
     @Arg('input') input: UserUpdateInput,
     @Ctx() ctx: MyContext
   ): Promise<User> {
