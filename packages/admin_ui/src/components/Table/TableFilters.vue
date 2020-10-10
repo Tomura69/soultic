@@ -38,8 +38,8 @@
                       ></v-radio>
                     </v-radio-group>
                   </div>
-                  <!-- Select type -->
-                  <div v-else-if="filter.type === 'select'">
+                  <!-- Select date type -->
+                  <div v-else-if="filter.type === 'select-date'">
                     <v-row align="baseline">
                       <v-col cols="9">
                         <v-select
@@ -73,6 +73,26 @@
                           >
                             mdi-calendar-blank
                           </v-icon>
+                        </v-select>
+                      </v-col>
+                    </v-row>
+                  </div>
+                  <!-- Select date type -->
+                  <div v-else-if="filter.type === 'select'">
+                    <v-row align="baseline">
+                      <v-col cols="9">
+                        <v-select
+                          outlined
+                          :items="filter.data"
+                          :value="filter.data[filter.active]"
+                          :multiple="false"
+                          @change="(t) => onSelectFilterChange(t, index)"
+                        >
+                          <template v-slot:selection="{ item }">
+                            <span>
+                              {{ item.text }}
+                            </span>
+                          </template>
                         </v-select>
                       </v-col>
                     </v-row>
@@ -149,8 +169,9 @@ import { TableFilters } from '@/types/Table'
 import {
   DynamicFilterOptionData,
   FilterOptions,
-  SelectFilter,
+  SelectDateFilter,
 } from '@/types/Filters'
+import { TranslateResult } from 'vue-i18n'
 
 type ChangeFilters = (data: TableFilters) => void
 
@@ -220,7 +241,7 @@ export default defineComponent({
         }
       },
       prepare(index, resetDate = false, selection) {
-        const { data } = filterDialog.data[index] as SelectFilter<unknown>
+        const { data } = filterDialog.data[index] as SelectDateFilter<unknown>
 
         // When changing selection date must reset
         if (resetDate) {
@@ -273,10 +294,20 @@ export default defineComponent({
       return value.join(' - ')
     }
 
+    const onSelectFilterChange = (text: TranslateResult, index: number) => {
+      const { data } = filterDialog.data[index]
+
+      if (!Array.isArray(data)) return
+
+      const filterIndex = data.findIndex((elem) => elem.text === text)
+      filterDialog.data[index].active = filterIndex
+    }
+
     return {
       dateDialog,
       filterDialog,
       selectedDate,
+      onSelectFilterChange,
     }
   },
 })

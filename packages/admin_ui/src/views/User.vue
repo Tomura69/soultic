@@ -86,10 +86,14 @@ import {
   MutationUpdateUserArgs,
   UpdateUserMutation,
   UserByIdQuery,
+  DeleteUserMutationVariables,
+  RestoreUserMutationVariables,
 } from '@/generated/graphql'
 import useDataMonitor from '@/modules/useDataMonitor'
 import useToast from '@/modules/useToast'
 import LoadingOverlay from '@/components/LoadingOverlay.vue'
+import DELETE_USER from '@/graphql/mutations/DELETE_USER'
+import RESTORE_USER from '@/graphql/mutations/RESTORE_USER'
 
 export default defineComponent({
   name: 'User',
@@ -102,30 +106,39 @@ export default defineComponent({
   setup(props, { root }) {
     const { addToast } = useToast()
 
-    const { refetch, result, loading: queryLoading } = useQuery<UserByIdQuery>(
+    const {
+      refetch,
+      result,
+      loading: queryLoading,
+      onResult: onUserResult,
+    } = useQuery<UserByIdQuery>(
       USER,
       {
-        id: root.$route.params.id,
+        id: Number(root.$route.params.id),
       },
       { fetchPolicy: 'no-cache' }
     )
 
     const user = useResult(result, {}, (data) => data.user)
 
+    const { getDataDifference, isDataChanged, makeDataEqual } = useDataMonitor(
+      user
+    )
+
+    onUserResult(() => {
+      // After user fetched data monitor resets
+      makeDataEqual()
+    })
+
     const { mutate, onDone, loading: mutationLoading } = useMutation<
       UpdateUserMutation,
       MutationUpdateUserArgs
     >(UPDATE_USER)
 
-    const { getDataDifference, isDataChanged, makeDataEqual } = useDataMonitor(
-      user
-    )
-
     onDone(async (res) => {
       if (res && res.data && res.data.updateUser) {
         mutationLoading.value = true
         await refetch()
-        makeDataEqual()
         mutationLoading.value = false
         addToast({ type: 'success', message: root.$t('changes-saved') })
       }
@@ -133,18 +146,30 @@ export default defineComponent({
 
     const updateData = () => {
       const input = getDataDifference()
-      if (input) mutate({ id: root.$route.params.id, input })
+      if (input) mutate({ id: Number(root.$route.params.id), input })
     }
 
+    const { mutate: deleteUserMutation } = useMutation<
+      boolean,
+      DeleteUserMutationVariables
+    >(DELETE_USER)
+    const { mutate: restoreUserMutation } = useMutation<
+      boolean,
+      RestoreUserMutationVariables
+    >(RESTORE_USER)
+
     const deleteUser = async () => {
-      mutate({
-        id: root.$route.params.id,
-        input: { deletedAt: new Date().toString() },
-      })
+      mutationLoading.value = true
+      await deleteUserMutation({ id: Number(root.$route.params.id) })
+      refetch()
+      mutationLoading.value = false
     }
 
     const restoreUser = async () => {
-      mutate({ id: root.$route.params.id, input: { deletedAt: null } })
+      mutationLoading.value = true
+      await restoreUserMutation({ id: Number(root.$route.params.id) })
+      refetch()
+      mutationLoading.value = false
     }
 
     const loading = computed(() => mutationLoading.value || queryLoading.value)

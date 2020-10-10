@@ -51,7 +51,7 @@ const getRawFilters = (
 
   filtersData.forEach(({ value, active, type }, index) => {
     if (typeof active === 'number') {
-      if (type === 'select') {
+      if (type === 'select-date') {
         if (value) {
           defaultFilters.push({
             index,
@@ -60,7 +60,7 @@ const getRawFilters = (
           })
         }
       }
-      if (type === 'radial') {
+      if (type === 'radial' || type === 'select') {
         defaultFilters.push({ index, active })
       }
     }

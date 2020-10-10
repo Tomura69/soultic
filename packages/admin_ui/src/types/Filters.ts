@@ -4,6 +4,7 @@ export type FilterOptions<T> = (
   | RadialFilter<T>
   | CheckboxFilter<T>
   | SelectFilter<T>
+  | SelectDateFilter<T>
 ) & { value?: string | string[] }
 
 export type RadialFilter<T> = {
@@ -13,12 +14,20 @@ export type RadialFilter<T> = {
   data: FilterOptionData<T>[]
 }
 
+export type SelectDateFilter<T> = {
+  text: TranslateResult
+  type: 'select-date'
+  active?: number
+  value?: string | string[]
+  data: DynamicFilterOptionData<T>[]
+}
+
 export type SelectFilter<T> = {
   text: TranslateResult
   type: 'select'
   active?: number
   value?: string | string[]
-  data: DynamicFilterOptionData<T>[]
+  data: FilterOptionData<T>[]
 }
 
 export type CheckboxFilter<T> = {

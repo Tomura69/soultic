@@ -32,13 +32,23 @@ export class AdminUserResolver {
     return this.userService.findOne({ id }, { withDeleted: true })
   }
 
+  @Mutation(() => Boolean)
+  async deleteUser(@Arg('id', () => Int) id: number) {
+    return this.userService.delete({ id })
+  }
+
+  @Mutation(() => Boolean)
+  async restoreUser(@Arg('id', () => Int) id: number) {
+    return this.userService.restore({ id })
+  }
+
   @Allow(Permission.updateUser)
-  @Mutation(() => User, { nullable: true })
+  @Mutation(() => Boolean, { nullable: true })
   async updateUser(
     @Arg('id', () => Int) id: number,
     @Arg('input') input: UserUpdateInput,
     @Ctx() ctx: MyContext
-  ): Promise<User> {
+  ): Promise<Boolean> {
     if (id === ctx.user!.id)
       throw new AppError(__('error.cant-update-yourself'))
 

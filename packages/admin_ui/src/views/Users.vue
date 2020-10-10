@@ -25,12 +25,15 @@ import {
   UserFilterParameters,
   User,
   UserSortParameters,
+  DeleteUserMutationVariables,
+  RestoreUserMutationVariables,
 } from '@/generated/graphql'
 import baseFilters from '@/shared/baseFilters'
 import useRouter from '@/modules/useRouter'
 import USERS from '@/graphql/queries/USERS'
 import { useMutation } from '@vue/apollo-composable'
-import UPDATE_USER from '@/graphql/mutations/UPDATE_USER'
+import RESTORE_USER from '@/graphql/mutations/RESTORE_USER'
+import DELETE_USER from '@/graphql/mutations/DELETE_USER'
 
 export default defineComponent({
   name: 'Users',
@@ -107,7 +110,7 @@ export default defineComponent({
         data: [
           {
             text: $t('filter.all'),
-            filter: { withDeleted: true },
+            filter: {},
           },
           {
             text: $t('filter.deleted'),
@@ -118,7 +121,7 @@ export default defineComponent({
           },
           {
             text: $t('filter.not-deleted'),
-            filter: { withDeleted: false },
+            filter: { deletedAt: { eq: null } },
           },
         ],
       },
@@ -146,20 +149,24 @@ export default defineComponent({
       baseFilters.updatedAt,
     ]
 
-    const { mutate } = useMutation(UPDATE_USER)
+    const { mutate: deleteUser } = useMutation<
+      boolean,
+      DeleteUserMutationVariables
+    >(DELETE_USER)
+    const { mutate: restoreUser } = useMutation<
+      boolean,
+      RestoreUserMutationVariables
+    >(RESTORE_USER)
 
     const actions: Actions<User> = {
       edit({ id }) {
         root.$router.push(`/users/${id}`)
       },
       async delete({ id }) {
-        await mutate({
-          id,
-          input: { deletedAt: new Date().toString() },
-        })
+        await deleteUser({ id })
       },
       async restore({ id }) {
-        await mutate({ id, input: { deletedAt: null } })
+        await restoreUser({ id })
       },
     }
 

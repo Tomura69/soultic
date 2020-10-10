@@ -15,6 +15,8 @@
   "users": "Vartotojai",
   "login-form": "Prisijungimas",
   "email": "El. paštas",
+  "title": "Pavadinimas",
+  "slug": "Slug",
   "firstname": "Vardas",
   "lastname": "Pavardė",
   "confirmed": "Patvirtintas",
@@ -35,6 +37,7 @@
   "user-deleted": "Vartotojas ištrintas",
   "user-restored": "Vartotojas atstatytas",
   "search-by-email": "Ieškoti pagal el. paštą",
+  "search-by-slug": "Ieškoti pagal unikalų pavadinimą (slug)",
   "configure": "Konfigūruoti",
   "loading": "Kraunasi",
   "no-data": "Nėra duomenų",
@@ -52,12 +55,18 @@
     "11": "Lapkričio",
     "12": "Gruodžio"
   },
+  "languages": {
+    "lt": "Lietuvių",
+    "en": "Anglų"
+  },
   "filter": {
     "do-filter": "Filtruoti",
     "one": "Filtras",
     "many": "Filtrai",
     "by-deleted-status": "Pagal ištrintimo statusą",
     "by-confirmed-status": "Pagal patvirtinimo statusą",
+    "by-missing-translation": "Pagal trūkstama vertinimą",
+    "by-language": "Pagal kalbą",
     "deleted": "Ištrinti",
     "not-deleted": "Neištrinti",
     "confirmed": "Patvirtinti",

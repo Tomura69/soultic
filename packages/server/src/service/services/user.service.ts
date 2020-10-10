@@ -1,7 +1,12 @@
 import bcrypt from 'bcryptjs'
 import { __ } from 'i18n'
 import { Service } from 'typedi'
-import { FindOneOptions, getConnection, getRepository } from 'typeorm'
+import {
+  FindConditions,
+  FindOneOptions,
+  getConnection,
+  getRepository,
+} from 'typeorm'
 
 import { UserFilterParameters } from '../../api/inputs/user/user-filter.input'
 import { LoginInput } from '../../api/inputs/user/login.input'
@@ -80,9 +85,19 @@ export class UserService {
     const result = await this.userRepo.update({ id }, data)
     if (!result.affected) throw new AppError(__('error.user-doesnt-exist'))
 
-    return this.userRepo.findOne({ id }) as Promise<User>
+    return true
   }
 
+  async restore(conditions: FindConditions<User>) {
+    const result = await this.userRepo.restore(conditions)
+    if (!result.affected) throw new AppError(__('error.user-doesnt-exist'))
+    return true
+  }
+  async delete(conditions: FindConditions<User>) {
+    const result = await this.userRepo.softDelete(conditions)
+    if (!result.affected) throw new AppError(__('error.user-doesnt-exist'))
+    return true
+  }
   async findOne(
     user: Partial<User>,
     options: FindOneOptions<User> = { withDeleted: true }

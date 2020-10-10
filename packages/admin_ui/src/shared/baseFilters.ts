@@ -10,7 +10,7 @@ function defineObject<T extends Record<string, TableFilter>>(arg: T): T {
 export default defineObject({
   createdAt: {
     text: i18n.t('filter.by-created-date'),
-    type: 'select',
+    type: 'select-date',
     data: [
       {
         text: i18n.t('after'),
@@ -35,7 +35,7 @@ export default defineObject({
   },
   deletedAt: {
     text: i18n.t('filter.by-deleted-date'),
-    type: 'select',
+    type: 'select-date',
     data: [
       {
         text: i18n.t('after'),
@@ -60,7 +60,7 @@ export default defineObject({
   },
   updatedAt: {
     text: i18n.t('filter.by-updated-date'),
-    type: 'select',
+    type: 'select-date',
     data: [
       {
         text: i18n.t('after'),
