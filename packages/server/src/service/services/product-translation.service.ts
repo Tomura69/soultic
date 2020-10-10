@@ -2,6 +2,7 @@ import { getRepository } from 'typeorm'
 import { ProductTranslationUpdateInput } from '../../api/inputs/product/product-translation-update.input'
 import { ProductTranslationInput } from '../../api/inputs/product/product-translation.input'
 import { ProductTranslation } from '../../entities/product/product-translation.entity'
+import { getUniqueSlug } from '../../utils/getUniqueSlug'
 
 export class ProductTranslationService {
   private readonly productTranslationRepo = getRepository(ProductTranslation)
@@ -11,6 +12,10 @@ export class ProductTranslationService {
       base: { id: productId },
       ...input,
     })
+  }
+
+  generateSlug(title: string, id?: number) {
+    return getUniqueSlug(ProductTranslation, title, id)
   }
 
   async update(id: number, input: ProductTranslationUpdateInput) {

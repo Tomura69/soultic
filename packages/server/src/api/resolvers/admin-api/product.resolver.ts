@@ -50,6 +50,14 @@ export class AdminProductResolver {
     return this.productTranslationService.create(id, input)
   }
 
+  @Mutation(() => String)
+  async generateProductTranslationSlug(
+    @Arg('id', () => Int, { nullable: true }) id: number,
+    @Arg('title') title: string
+  ) {
+    return this.productTranslationService.generateSlug(title, id)
+  }
+
   @Mutation(() => ProductTranslation)
   async updateProductTranslation(
     @Arg('id', () => Int) id: number,

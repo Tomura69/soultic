@@ -1,14 +1,16 @@
 import slugify from 'slugify'
-import { getRepository, Raw, ObjectType } from 'typeorm'
+import { getRepository, Raw, ObjectType, Not } from 'typeorm'
 
 async function getUniqueSlug<T extends { slug: string }>(
   entity: ObjectType<T>,
-  value: string
+  value: string,
+  whereIdNot?: number
 ) {
   const slug = slugify(value, { lower: true })
 
   const result = await getRepository(entity).find({
     where: {
+      ...(whereIdNot ? { id: Not(whereIdNot) } : {}),
       slug: Raw((alias) => `${alias} ~ '^${slug}-\\d+$|^${slug}$'`),
     },
     select: ['slug'],
