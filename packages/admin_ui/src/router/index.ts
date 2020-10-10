@@ -5,6 +5,7 @@ import useMe from '@/modules/useMe'
 import i18n from '@/plugins/i18n'
 import Dashboard from '../views/Dashboard.vue'
 import Products from '../views/Products.vue'
+import Product from '../views/Product.vue'
 import Users from '../views/Users.vue'
 import User from '../views/User.vue'
 import Login from '../views/Login.vue'
@@ -33,6 +34,17 @@ const routes: Array<RouteMetaConfig> = [
         {
           name: i18n.t('products'),
         },
+      ],
+    },
+  },
+  {
+    path: '/products/:id',
+    name: 'Product',
+    component: Product,
+    meta: {
+      breadcrumbs: [
+        { name: i18n.t('products'), link: '/products' },
+        { genName: ({ params }) => params.id },
       ],
     },
   },

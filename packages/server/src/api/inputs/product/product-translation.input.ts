@@ -1,4 +1,4 @@
-import { Field, InputType } from 'type-graphql'
+import { Field, InputType, Int } from 'type-graphql'
 
 import { Base } from '../../../entities/base/base.entity'
 import { ProductTranslation } from '../../../entities/product/product-translation.entity'

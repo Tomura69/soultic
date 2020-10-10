@@ -20,8 +20,8 @@ export class ProductTranslationService {
 
   async update(id: number, input: ProductTranslationUpdateInput) {
     const result = await this.productTranslationRepo.update({ id }, input)
-    if (!result.affected) return
-    return this.productTranslationRepo.findOne({ id })
+    if (!result.affected) return false
+    return true
   }
 
   delete(id: number) {

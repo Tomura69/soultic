@@ -14,6 +14,7 @@ import {
 } from '../../../service/services/product.service'
 import { ProductTranslationService } from '../../../service/services/product-translation.service'
 import { ProductTranslationUpdateInput } from '../../inputs/product/product-translation-update.input'
+import { AppError } from '../../../utils/AppError'
 
 @Resolver(() => Product)
 export class AdminProductResolver {
@@ -52,18 +53,28 @@ export class AdminProductResolver {
 
   @Mutation(() => String)
   async generateProductTranslationSlug(
-    @Arg('id', () => Int, { nullable: true }) id: number,
-    @Arg('title') title: string
+    @Arg('title') title: string,
+    @Arg('id', () => Int, { nullable: true }) id?: number
   ) {
     return this.productTranslationService.generateSlug(title, id)
   }
 
-  @Mutation(() => ProductTranslation)
-  async updateProductTranslation(
-    @Arg('id', () => Int) id: number,
+  @Mutation(() => Boolean)
+  async updateOrCreateProductTranslation(
+    @Arg('id', () => Int, { nullable: true }) id: number,
     @Arg('input') input: ProductTranslationUpdateInput
   ) {
-    return this.productTranslationService.update(id, input)
+    if (!id && !input.id)
+      throw new AppError('error.need-to-provide-atleast-one-of-ids')
+
+    if (input.id) {
+      return this.productTranslationService.update(input.id, input)
+    }
+    // Create translation
+    if (!input.slug)
+      input.slug = await this.generateProductTranslationSlug(input.title)
+    await this.addProductTranslation(id, input as any)
+    return true
   }
 
   @Mutation(() => Boolean)
@@ -80,11 +91,8 @@ export class AdminProductResolver {
   }
 
   @Query(() => Product, { nullable: true })
-  async product(
-    @Arg('slug')
-    slug: string
-  ) {
-    return this.productService.findBySlug(slug)
+  async product(@Arg('id', () => Int) id: number) {
+    return this.productService.findOne(id)
   }
 
   @Query(() => ProductList)

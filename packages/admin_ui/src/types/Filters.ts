@@ -17,6 +17,7 @@ export type RadialFilter<T> = {
 export type SelectDateFilter<T> = {
   text: TranslateResult
   type: 'select-date'
+  clearable?: boolean
   active?: number
   value?: string | string[]
   data: DynamicFilterOptionData<T>[]
@@ -25,6 +26,7 @@ export type SelectDateFilter<T> = {
 export type SelectFilter<T> = {
   text: TranslateResult
   type: 'select'
+  clearable?: boolean
   active?: number
   value?: string | string[]
   data: FilterOptionData<T>[]

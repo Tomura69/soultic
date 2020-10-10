@@ -5,6 +5,7 @@
         :to="item.link"
         :disabled="item.link ? false : true"
         :exact="true"
+        class="text-uppercase"
       >
         {{ item.name }}
       </v-breadcrumbs-item>

@@ -11,6 +11,7 @@ export default defineObject({
   createdAt: {
     text: i18n.t('filter.by-created-date'),
     type: 'select-date',
+    clearable: true,
     data: [
       {
         text: i18n.t('after'),
@@ -36,6 +37,7 @@ export default defineObject({
   deletedAt: {
     text: i18n.t('filter.by-deleted-date'),
     type: 'select-date',
+    clearable: true,
     data: [
       {
         text: i18n.t('after'),
@@ -61,6 +63,7 @@ export default defineObject({
   updatedAt: {
     text: i18n.t('filter.by-updated-date'),
     type: 'select-date',
+    clearable: true,
     data: [
       {
         text: i18n.t('after'),

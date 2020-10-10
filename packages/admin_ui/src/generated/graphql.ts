@@ -32,7 +32,7 @@ export type QueryUserArgs = {
 }
 
 export type QueryProductArgs = {
-  slug: Scalars['String']
+  id: Scalars['Int']
 }
 
 export type QueryProductsArgs = {
@@ -230,14 +230,15 @@ export type Mutation = {
   __typename?: 'Mutation'
   deleteUser: Scalars['Boolean']
   restoreUser: Scalars['Boolean']
-  updateUser?: Maybe<User>
+  updateUser?: Maybe<Scalars['Boolean']>
   login?: Maybe<User>
   logout: Scalars['Boolean']
   createProduct: Product
   deleteProduct: Scalars['Boolean']
   restoreProduct: Scalars['Boolean']
   addProductTranslation: ProductTranslation
-  updateProductTranslation: ProductTranslation
+  generateProductTranslationSlug: Scalars['String']
+  updateOrCreateProductTranslation: Scalars['Boolean']
   deleteProductTranslation: Scalars['Boolean']
   removeProduct: Scalars['Boolean']
   createFacet: Facet
@@ -282,9 +283,14 @@ export type MutationAddProductTranslationArgs = {
   id: Scalars['Int']
 }
 
-export type MutationUpdateProductTranslationArgs = {
+export type MutationGenerateProductTranslationSlugArgs = {
+  title: Scalars['String']
+  id?: Maybe<Scalars['Int']>
+}
+
+export type MutationUpdateOrCreateProductTranslationArgs = {
   input: ProductTranslationUpdateInput
-  id: Scalars['Int']
+  id?: Maybe<Scalars['Int']>
 }
 
 export type MutationDeleteProductTranslationArgs = {
@@ -347,6 +353,8 @@ export type ProductTranslationInput = {
 }
 
 export type ProductTranslationUpdateInput = {
+  id?: Maybe<Scalars['Int']>
+  slug?: Maybe<Scalars['String']>
   languageCode?: Maybe<LanguageCode>
   title?: Maybe<Scalars['String']>
   description?: Maybe<Scalars['String']>
@@ -379,6 +387,15 @@ export type ProductVariantInput = {
   facetValues: Array<Scalars['Int']>
 }
 
+export type UpdateOrCreateProductTranslationMutationVariables = Exact<{
+  id: Scalars['Int']
+  input: ProductTranslationUpdateInput
+}>
+
+export type UpdateOrCreateProductTranslationMutation = {
+  __typename?: 'Mutation'
+} & Pick<Mutation, 'updateOrCreateProductTranslation'>
+
 export type DeleteProductMutationVariables = Exact<{
   id: Scalars['Int']
 }>
@@ -396,6 +413,15 @@ export type DeleteUserMutation = { __typename?: 'Mutation' } & Pick<
   Mutation,
   'deleteUser'
 >
+
+export type GenerateProductTranslationSlugMutationVariables = Exact<{
+  id?: Maybe<Scalars['Int']>
+  title: Scalars['String']
+}>
+
+export type GenerateProductTranslationSlugMutation = {
+  __typename?: 'Mutation'
+} & Pick<Mutation, 'generateProductTranslationSlug'>
 
 export type AdminLoginMutationVariables = Exact<{
   email: Scalars['String']
@@ -441,22 +467,10 @@ export type UpdateUserMutationVariables = Exact<{
   input: UserUpdateInput
 }>
 
-export type UpdateUserMutation = { __typename?: 'Mutation' } & {
-  updateUser?: Maybe<
-    { __typename?: 'User' } & Pick<
-      User,
-      | 'id'
-      | 'firstname'
-      | 'lastname'
-      | 'email'
-      | 'roles'
-      | 'confirmed'
-      | 'createdAt'
-      | 'updatedAt'
-      | 'deletedAt'
-    >
-  >
-}
+export type UpdateUserMutation = { __typename?: 'Mutation' } & Pick<
+  Mutation,
+  'updateUser'
+>
 
 export type AdminMeQueryVariables = Exact<{ [key: string]: never }>
 
@@ -464,6 +478,32 @@ export type AdminMeQuery = { __typename?: 'Query' } & {
   me: { __typename?: 'User' } & Pick<
     User,
     'id' | 'email' | 'firstname' | 'lastname'
+  >
+}
+
+export type ProductByIdQueryVariables = Exact<{
+  id: Scalars['Int']
+}>
+
+export type ProductByIdQuery = { __typename?: 'Query' } & {
+  product?: Maybe<
+    { __typename?: 'Product' } & Pick<
+      Product,
+      'id' | 'languageCode' | 'createdAt' | 'updatedAt' | 'deletedAt'
+    > & {
+        translations: Array<
+          { __typename?: 'ProductTranslation' } & Pick<
+            ProductTranslation,
+            'id' | 'languageCode' | 'title' | 'slug' | 'description'
+          >
+        >
+        variants: Array<
+          { __typename?: 'ProductVariant' } & Pick<
+            ProductVariant,
+            'id' | 'price' | 'sku'
+          >
+        >
+      }
   >
 }
 
@@ -476,7 +516,13 @@ export type ProductListQuery = { __typename?: 'Query' } & {
       items: Array<
         { __typename?: 'Product' } & Pick<
           Product,
-          'id' | 'title' | 'slug' | 'createdAt' | 'updatedAt' | 'deletedAt'
+          | 'id'
+          | 'title'
+          | 'slug'
+          | 'languageCode'
+          | 'createdAt'
+          | 'updatedAt'
+          | 'deletedAt'
         >
       >
     }

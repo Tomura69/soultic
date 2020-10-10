@@ -49,7 +49,7 @@
                           :value="filter.data[filter.active]"
                           return-object
                           :multiple="false"
-                          :clearable="true"
+                          :clearable="filter.clearable === true"
                           @change="
                             (data) => dateDialog.prepare(index, true, data)
                           "
@@ -83,9 +83,11 @@
                       <v-col cols="9">
                         <v-select
                           outlined
+                          :placeholder="$t('select')"
                           :items="filter.data"
                           :value="filter.data[filter.active]"
                           :multiple="false"
+                          :clearable="filter.clearable === true"
                           @change="(t) => onSelectFilterChange(t, index)"
                         >
                           <template v-slot:selection="{ item }">

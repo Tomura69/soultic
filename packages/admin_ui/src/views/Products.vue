@@ -120,9 +120,8 @@ export default defineComponent({
       {
         text: $t('filter.by-missing-translation'),
         type: 'select',
-        active: 0,
+        clearable: true,
         data: [
-          { text: $t('blank'), filter: {} },
           {
             text: $t('languages.lt'),
             filter: { languageCode: { nin: ['lt'] } },
@@ -148,8 +147,8 @@ export default defineComponent({
     >(RESTORE_PRODUCT)
 
     const actions: Actions<Product> = {
-      edit({ id }) {
-        root.$router.push(`/products/${id}`)
+      edit({ id, languageCode }) {
+        root.$router.push(`/products/${id}?language=${languageCode}`)
       },
       async delete({ id }) {
         await deleteProduct({ id })

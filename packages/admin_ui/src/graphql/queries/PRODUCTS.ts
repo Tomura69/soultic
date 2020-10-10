@@ -7,6 +7,7 @@ export default gql`
         id
         title
         slug
+        languageCode
         createdAt
         updatedAt
         deletedAt
