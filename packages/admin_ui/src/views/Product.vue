@@ -75,7 +75,7 @@
               </v-col>
             </v-row>
           </v-col>
-          <!-- Assets -->
+          <!-- Description -->
           <v-col>
             <v-textarea
               outlined

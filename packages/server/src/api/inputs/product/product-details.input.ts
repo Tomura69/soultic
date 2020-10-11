@@ -8,4 +8,7 @@ export class ProductInput {
 
   @Field(() => LanguageCode, { nullable: true })
   languageCode?: LanguageCode
+
+  @Field({ nullable: true })
+  description: string
 }

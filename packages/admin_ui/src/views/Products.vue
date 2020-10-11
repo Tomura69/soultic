@@ -7,13 +7,18 @@
       :searchOptions="searchOptions"
       :query-document="PRODUCTS"
       :actions="actions"
-    />
+    >
+      <template v-slot:topbar>
+        <AddProduct class="mb-5" />
+      </template>
+    </Table>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from '@vue/composition-api'
 import Table from '@/components/Table/Table.vue'
+import AddProduct from '@/components/Product/AddProduct.vue'
 import {
   TableHeaders,
   TableOptions,
@@ -37,7 +42,7 @@ import RESTORE_PRODUCT from '@/graphql/mutations/RESTORE_PRODUCT'
 
 export default defineComponent({
   name: 'Products',
-  components: { Table },
+  components: { Table, AddProduct },
   setup(props, { root }) {
     const { changeQuery } = useRouter(root)
     const $t = (key: string) => root.$t(key)
@@ -99,7 +104,7 @@ export default defineComponent({
       {
         text: $t('filter.by-deleted-status'),
         type: 'radial',
-        active: 0,
+        active: 2,
         data: [
           {
             text: $t('filter.all'),

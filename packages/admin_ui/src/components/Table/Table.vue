@@ -1,105 +1,112 @@
 <template>
-  <v-card class="mb-5" elevation="1">
-    <div>
-      <v-toolbar flat class="mb-2">
-        <v-row justify="space-between" align="center">
-          <!-- Search -->
-          <Search
-            class="col-6 col-xs-3 col-md-3"
-            :placeholder="searchOptions.placeholder"
-            :on-search="searchOptions.onSearch"
-          />
-          <div>
-            <!-- Filters -->
-            <Filters
-              :filters-data="currentFiltersData"
-              :change-filters="changeFilters"
-            />
-            <!-- Fields -->
-            <Fields :fields.sync="fields" />
-          </div>
-        </v-row>
-      </v-toolbar>
-      <v-data-table
-        style="border-bottom: 1px solid rgba(0, 0, 0, 0.1)"
-        mobile-breakpoint="0"
-        must-sort
-        :sort-by.sync="options.sortField"
-        :sort-desc.sync="options.sortAsc"
-        :headers="showableHeaders"
-        :header-props="{ sortIcon: 'mdi-arrow-down' }"
-        :server-items-length="data.totalCount"
-        :items="data.items"
-        :loading="loading"
-        hide-default-footer
-        :loading-text="`${$t('loading')}...`"
-        :no-data-text="$t('no-data')"
-      >
-        <template v-slot:item="{ item, headers }">
-          <tr class="text-center">
-            <template v-for="(header, index) in headers">
-              <!-- Confirmed -->
-              <td v-if="header.value === 'confirmed'" :key="index">
-                <v-icon
-                  small
-                  style="display: inline-block"
-                  :class="!item.confirmed ? 'red--text' : 'success--text'"
-                >
-                  mdi-circle
-                </v-icon>
-              </td>
-              <!-- Actions -->
-              <td v-else-if="header.value === ''" :key="index">
-                <v-btn
-                  x-small
-                  icon
-                  v-if="actions.edit"
-                  @click="doAction('edit', item)"
-                >
-                  <v-icon>mdi-pencil</v-icon>
-                </v-btn>
-
-                <v-btn
-                  x-small
-                  icon
-                  v-if="actions.edit && actions.delete"
-                  @click="
-                    doAction(
-                      item.deletedAt === null ? 'delete' : 'restore',
-                      item
-                    )
-                  "
-                  class="ml-1"
-                >
-                  <v-icon>
-                    {{ item.deletedAt === null ? 'mdi-delete' : 'mdi-restore' }}
-                  </v-icon>
-                </v-btn>
-              </td>
-              <!-- Blank -->
-              <td
-                v-else-if="
-                  item[header.value] === null ||
-                  item[header.value] === undefined
-                "
-                :key="index"
-                class="text-caption grey--text"
-              >
-                {{ $t('blank') }}
-              </td>
-              <!-- Item value -->
-              <td v-else :key="index">{{ item[header.value] }}</td>
-            </template>
-          </tr>
-        </template>
-      </v-data-table>
-      <TablePagination
-        :items-per-page.sync="options.limit"
-        :total-items="data.totalCount"
-        :current-page.sync="options.page"
-      />
+  <div>
+    <div class="mb-1">
+      <slot name="topbar"></slot>
     </div>
-  </v-card>
+    <v-card class="mb-5" elevation="1">
+      <div>
+        <v-toolbar flat class="mb-2">
+          <v-row justify="space-between" align="center">
+            <!-- Search -->
+            <Search
+              class="col-6 col-xs-3 col-md-3"
+              :placeholder="searchOptions.placeholder"
+              :on-search="searchOptions.onSearch"
+            />
+            <div>
+              <!-- Filters -->
+              <Filters
+                :filters-data="currentFiltersData"
+                :change-filters="changeFilters"
+              />
+              <!-- Fields -->
+              <Fields :fields.sync="fields" />
+            </div>
+          </v-row>
+        </v-toolbar>
+        <v-data-table
+          style="border-bottom: 1px solid rgba(0, 0, 0, 0.1)"
+          mobile-breakpoint="0"
+          must-sort
+          :sort-by.sync="options.sortField"
+          :sort-desc.sync="options.sortAsc"
+          :headers="showableHeaders"
+          :header-props="{ sortIcon: 'mdi-arrow-down' }"
+          :server-items-length="data.totalCount"
+          :items="data.items"
+          :loading="loading"
+          hide-default-footer
+          :loading-text="`${$t('loading')}...`"
+          :no-data-text="$t('no-data')"
+        >
+          <template v-slot:item="{ item, headers }">
+            <tr class="text-center">
+              <template v-for="(header, index) in headers">
+                <!-- Confirmed -->
+                <td v-if="header.value === 'confirmed'" :key="index">
+                  <v-icon
+                    small
+                    style="display: inline-block"
+                    :class="!item.confirmed ? 'red--text' : 'success--text'"
+                  >
+                    mdi-circle
+                  </v-icon>
+                </td>
+                <!-- Actions -->
+                <td v-else-if="header.value === ''" :key="index">
+                  <v-btn
+                    x-small
+                    icon
+                    v-if="actions.edit"
+                    @click="doAction('edit', item)"
+                  >
+                    <v-icon>mdi-pencil</v-icon>
+                  </v-btn>
+
+                  <v-btn
+                    x-small
+                    icon
+                    v-if="actions.edit && actions.delete"
+                    @click="
+                      doAction(
+                        item.deletedAt === null ? 'delete' : 'restore',
+                        item
+                      )
+                    "
+                    class="ml-1"
+                  >
+                    <v-icon>
+                      {{
+                        item.deletedAt === null ? 'mdi-delete' : 'mdi-restore'
+                      }}
+                    </v-icon>
+                  </v-btn>
+                </td>
+                <!-- Blank -->
+                <td
+                  v-else-if="
+                    item[header.value] === null ||
+                    item[header.value] === undefined
+                  "
+                  :key="index"
+                  class="text-caption grey--text"
+                >
+                  {{ $t('blank') }}
+                </td>
+                <!-- Item value -->
+                <td v-else :key="index">{{ item[header.value] }}</td>
+              </template>
+            </tr>
+          </template>
+        </v-data-table>
+        <TablePagination
+          :items-per-page.sync="options.limit"
+          :total-items="data.totalCount"
+          :current-page.sync="options.page"
+        />
+      </div>
+    </v-card>
+  </div>
 </template>
 
 <script lang="ts">

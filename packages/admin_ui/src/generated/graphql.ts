@@ -284,8 +284,8 @@ export type MutationAddProductTranslationArgs = {
 }
 
 export type MutationGenerateProductTranslationSlugArgs = {
-  title: Scalars['String']
   id?: Maybe<Scalars['Int']>
+  title: Scalars['String']
 }
 
 export type MutationUpdateOrCreateProductTranslationArgs = {
@@ -344,6 +344,7 @@ export type LoginInput = {
 export type ProductInput = {
   title: Scalars['String']
   languageCode?: Maybe<LanguageCode>
+  description?: Maybe<Scalars['String']>
 }
 
 export type ProductTranslationInput = {
@@ -385,6 +386,17 @@ export type FacetValueTranslationInput = {
 export type ProductVariantInput = {
   price: Scalars['Int']
   facetValues: Array<Scalars['Int']>
+}
+
+export type CreateProductMutationVariables = Exact<{
+  input: ProductInput
+}>
+
+export type CreateProductMutation = { __typename?: 'Mutation' } & {
+  createProduct: { __typename?: 'Product' } & Pick<
+    Product,
+    'id' | 'languageCode'
+  >
 }
 
 export type UpdateOrCreateProductTranslationMutationVariables = Exact<{

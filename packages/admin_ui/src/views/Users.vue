@@ -106,7 +106,7 @@ export default defineComponent({
       {
         text: $t('filter.by-deleted-status'),
         type: 'radial',
-        active: 0,
+        active: 2,
         data: [
           {
             text: $t('filter.all'),
