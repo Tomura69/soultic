@@ -6,6 +6,7 @@ import {
 } from 'typeorm'
 
 import { ProductVariantInput } from '../../api/inputs/product/product-variant.input'
+import { LanguageCode } from '../../api/types/languageCode'
 import { FacetValue } from '../../entities/facet-value/facet-value.entity'
 import { ProductVariant } from '../../entities/product/product-variant.entity'
 import {
@@ -42,14 +43,18 @@ export class ProductVariantService {
     })
   }
 
-  async getFacetValues(productVariantId: number) {
+  async getFacetValues(productVariantId: number, languageCode: LanguageCode) {
     return this.productVariantRepo
       .findOne({
         where: { id: productVariantId },
         relations: ['facetValues', 'facetValues.base'],
       })
       .then((variant) =>
-        !variant ? [] : variant.facetValues.map((value) => translateDeep(value))
+        !variant
+          ? []
+          : variant.facetValues.map((value) =>
+              translateDeep(value, languageCode)
+            )
       )
   }
 }

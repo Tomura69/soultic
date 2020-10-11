@@ -5,6 +5,8 @@ import { User } from '../entities/user/user.entity'
 import { GraphQLSchema } from 'graphql'
 import { Application } from 'express'
 import session, { SessionOptions } from 'express-session'
+import { getLocale } from 'i18n'
+import { LanguageCode } from '../api/types/languageCode'
 
 export const createApiEndPoint = async (
   endpoint: string,
@@ -26,6 +28,7 @@ export const createApiEndPoint = async (
         req,
         session: req.session as any,
         user: req.session!.user as User,
+        languageCode: getLocale(req) as LanguageCode,
       }
     },
   })

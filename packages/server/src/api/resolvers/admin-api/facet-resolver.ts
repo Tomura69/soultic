@@ -1,4 +1,4 @@
-import { Arg, Int, Mutation, Query, Resolver } from 'type-graphql'
+import { Arg, Ctx, Int, Mutation, Query, Resolver } from 'type-graphql'
 import { Inject } from 'typedi'
 
 import { FacetTranslation } from '../../../entities/facet/facet-translation.entity'
@@ -10,6 +10,7 @@ import { FacetTranslationInput } from '../../inputs/facet/facet-translation.inpu
 import { FacetValueTranslationInput } from '../../inputs/facet-value/facet-value-translation'
 import { FacetValueInput } from '../../inputs/facet-value/facet-value.input'
 import { FacetInput } from '../../inputs/facet/facet.input'
+import { MyContext } from '../../../types/MyContext'
 
 @Resolver()
 export class FacetResolver {
@@ -49,7 +50,7 @@ export class FacetResolver {
   }
 
   @Query(() => [Facet])
-  facets() {
-    return this.facetService.findAll()
+  facets(@Ctx() ctx: MyContext) {
+    return this.facetService.findAll(ctx.languageCode)
   }
 }

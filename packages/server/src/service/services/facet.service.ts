@@ -7,6 +7,7 @@ import { FacetTranslation } from '../../entities/facet/facet-translation.entity'
 import { FacetValueTranslation } from '../../entities/facet-value/facet-value-translation.entity'
 import { Facet } from '../../entities/facet/facet.entity'
 import { translateEntity } from '../helpers/translation/translate-entity'
+import { LanguageCode } from '../../api/types/languageCode'
 
 @Service()
 export class FacetService {
@@ -22,9 +23,11 @@ export class FacetService {
     return this.facetTranslationRepo.save({ base: { id: facetId }, ...input })
   }
 
-  async findAll() {
+  async findAll(languageCode: LanguageCode) {
     return this.facetRepo
       .find()
-      .then((facets) => facets.map((facet) => translateEntity(facet)))
+      .then((facets) =>
+        facets.map((facet) => translateEntity(facet, languageCode))
+      )
   }
 }

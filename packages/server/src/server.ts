@@ -7,6 +7,7 @@ import * as classValidator from 'class-validator'
 import i18n from 'i18n'
 import { createConnection } from 'typeorm'
 import { Container } from 'typedi'
+import cookieParser from 'cookie-parser'
 
 import { TypeormStore } from './lib/session/TypeormStore'
 import { createApiEndPoint } from './utils/createApiEndPoint'
@@ -44,6 +45,7 @@ const main = async () => {
 
   app.set('trust proxy', '127.0.0.1')
   app.use(cors(corsOptions))
+  app.use(cookieParser())
 
   /**
    * Locales
@@ -52,7 +54,7 @@ const main = async () => {
   i18n.configure({
     locales: Object.values(LanguageCode),
     defaultLocale: DEFAULT_LANGUAGE_CODE,
-    cookie: 'locale',
+    cookie: 'language',
     directory: __dirname + './../locales',
   })
 
@@ -66,6 +68,17 @@ const main = async () => {
   const repository = typeorm.getRepository(Session)
 
   app.get(`${process.env.REGISTER_CONFIRM_URL!}/:id`, confirmEmail)
+
+  // Set language cookie if not set
+  app.use((req, res, next) => {
+    if (!req.cookies.language) {
+      res.cookie('language', DEFAULT_LANGUAGE_CODE, {
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365),
+      })
+    }
+
+    next()
+  })
 
   await createApiEndPoint('/shop-api', app, corsOptions, shopSchema, {
     resave: false,

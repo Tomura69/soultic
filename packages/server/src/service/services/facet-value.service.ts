@@ -3,6 +3,7 @@ import { FindManyOptions, FindOneOptions, getRepository } from 'typeorm'
 
 import { FacetValueTranslationInput } from '../../api/inputs/facet-value/facet-value-translation'
 import { FacetValueInput } from '../../api/inputs/facet-value/facet-value.input'
+import { LanguageCode } from '../../api/types/languageCode'
 import { FacetValueTranslation } from '../../entities/facet-value/facet-value-translation.entity'
 import { FacetValue } from '../../entities/facet-value/facet-value.entity'
 import { translateEntity } from '../helpers/translation/translate-entity'
@@ -30,16 +31,24 @@ export class FacetValueService {
     })
   }
 
-  async findAll(options: FindManyOptions<FacetValue>) {
+  async findAll(
+    options: FindManyOptions<FacetValue>,
+    languageCode: LanguageCode
+  ) {
     return this.facetValueRepo
       .find(options)
-      .then((facetValues) => facetValues.map((value) => translateEntity(value)))
+      .then((facetValues) =>
+        facetValues.map((value) => translateEntity(value, languageCode))
+      )
   }
 
-  async findOne(options: FindOneOptions<FacetValue>) {
+  async findOne(
+    options: FindOneOptions<FacetValue>,
+    languageCode: LanguageCode
+  ) {
     return this.facetValueRepo.findOne(options).then((value) => {
       if (!value) return
-      return translateEntity(value)
+      return translateEntity(value, languageCode)
     })
   }
 }

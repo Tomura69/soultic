@@ -1,5 +1,5 @@
 import { Inject } from 'typedi'
-import { Resolver, Mutation, Arg, Query, Int } from 'type-graphql'
+import { Resolver, Mutation, Arg, Query, Int, Ctx } from 'type-graphql'
 
 import { Product } from '../../../entities/product/product.entity'
 import { Allow } from '../../middleware/decorators/Allow'
@@ -15,6 +15,7 @@ import {
 import { ProductTranslationService } from '../../../service/services/product-translation.service'
 import { ProductTranslationUpdateInput } from '../../inputs/product/product-translation-update.input'
 import { AppError } from '../../../utils/AppError'
+import { MyContext } from '../../../types/MyContext'
 
 @Resolver(() => Product)
 export class AdminProductResolver {
@@ -28,9 +29,10 @@ export class AdminProductResolver {
   @Mutation(() => Product)
   async createProduct(
     @Arg('input')
-    input: ProductInput
+    input: ProductInput,
+    @Ctx() ctx: MyContext
   ): Promise<Product> {
-    return this.productService.create(input)
+    return this.productService.create(input, ctx.languageCode)
   }
 
   @Mutation(() => Boolean)
@@ -91,12 +93,15 @@ export class AdminProductResolver {
   }
 
   @Query(() => Product, { nullable: true })
-  async product(@Arg('id', () => Int) id: number) {
-    return this.productService.findOne(id)
+  async product(@Arg('id', () => Int) id: number, @Ctx() ctx: MyContext) {
+    return this.productService.findOne(id, ctx.languageCode)
   }
 
   @Query(() => ProductList)
-  async products(@Arg('options') options: ProductListOptions) {
-    return this.productService.findAll(options)
+  async products(
+    @Arg('options') options: ProductListOptions,
+    @Ctx() ctx: MyContext
+  ) {
+    return this.productService.findAll(options, ctx.languageCode)
   }
 }

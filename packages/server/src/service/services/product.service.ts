@@ -32,8 +32,8 @@ export type ProductListOptions = InstanceType<typeof ProductListOptions>
 export class ProductService {
   private readonly productRepo = getRepository(Product)
 
-  async create(input: ProductInput) {
-    if (!input.languageCode) input.languageCode = getLocale() as LanguageCode
+  async create(input: ProductInput, languageCode: LanguageCode) {
+    if (!input.languageCode) input.languageCode = languageCode
     const translation = Object.assign(new ProductTranslation(), input)
     const entity = Object.assign(new Product(), { translations: [translation] })
     const product = await this.productRepo.save(entity)
@@ -49,7 +49,7 @@ export class ProductService {
 
   async findOne(
     id: number,
-    languageCode?: LanguageCode,
+    languageCode: LanguageCode,
     findOptions: FindOneOptions = { withDeleted: true }
   ) {
     return this.productRepo.findOne(id, findOptions).then((product) => {
@@ -60,6 +60,7 @@ export class ProductService {
 
   async findBySlug(
     slug: string,
+    languageCode: LanguageCode,
     findOptions: FindManyOptions = { withDeleted: true }
   ) {
     const translation = await getRepository(ProductTranslation)
@@ -68,10 +69,14 @@ export class ProductService {
       .getRawOne()
     if (!translation) return
 
-    return this.findOne(translation.translation_baseId, undefined, findOptions)
+    return this.findOne(
+      translation.translation_baseId,
+      languageCode,
+      findOptions
+    )
   }
 
-  async findAll(options: ProductListOptions, languageCode?: LanguageCode) {
+  async findAll(options: ProductListOptions, languageCode: LanguageCode) {
     return listQuery(Product, options)
       .getManyAndCount()
       .then(([products, totalCount]) => {

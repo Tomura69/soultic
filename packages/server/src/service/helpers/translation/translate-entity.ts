@@ -6,7 +6,7 @@ import { Translatable, Translated } from '../../../types/Translation'
 
 export const translateEntity = <Entity extends Translatable>(
   entity: Entity,
-  languageCode: LanguageCode = getLocale() as LanguageCode
+  languageCode: LanguageCode
 ): Translated<Entity> => {
   const { translations } = entity
   let translation = translations.find((t) => t.languageCode === languageCode)
@@ -40,7 +40,7 @@ export const translateEntity = <Entity extends Translatable>(
 // Translates entity, and entity's nested fields(relations)
 export const translateDeep = <Entity extends Translatable>(
   entity: Entity,
-  languageCode: LanguageCode = getLocale() as LanguageCode,
+  languageCode: LanguageCode,
   maxDeep = 2,
   deepness = 0
 ) => {
