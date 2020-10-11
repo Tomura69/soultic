@@ -20,81 +20,95 @@
       </span>
     </v-row>
     <v-card elevation="1" class="pa-3" v-if="product">
-      <LoadingOverlay :loading="false" />
-      <v-row>
-        <v-col cols="6">
-          <v-row>
-            <v-col>
-              <div class="caption grey--text">ID</div>
-              <div>{{ product.id }}</div>
-            </v-col>
-          </v-row>
-          <!-- Title & slug -->
-          <v-row>
-            <v-col>
-              <v-text-field
-                :label="$t('title')"
-                hide-details
-                v-model="selectedTranslation.title"
-              ></v-text-field>
-            </v-col>
-            <v-col>
-              <div class="d-inline-flex align-center">
+      <v-form ref="productForm">
+        <LoadingOverlay :loading="false" />
+        <v-row>
+          <v-col cols="6">
+            <v-row>
+              <v-col>
+                <div class="caption grey--text">ID</div>
+                <div>{{ product.id }}</div>
+              </v-col>
+            </v-row>
+            <!-- Title & slug -->
+            <v-row>
+              <v-col>
                 <v-text-field
-                  :label="$t('slug')"
-                  value="2"
+                  :label="$t('title')"
+                  required
                   hide-details
-                  disabled
-                  :loading="slugIsLoading"
-                  v-model="selectedTranslation.slug"
+                  :rules="selectedTranslationRules.title"
+                  v-model="selectedTranslation.title"
                 ></v-text-field>
-                <v-btn icon class="mt-4" small @click="refreshSlug()">
-                  <v-icon>mdi-refresh</v-icon>
-                </v-btn>
-              </div>
-            </v-col>
-          </v-row>
-          <!-- Dates -->
-          <v-row>
-            <v-col>
-              <div class="caption grey--text">{{ $t('createdAt') }}</div>
-              <div>{{ product.createdAt }}</div>
-            </v-col>
-            <v-col>
-              <div class="caption grey--text">{{ $t('updatedAt') }}</div>
-              <div>{{ product.updatedAt }}</div>
-            </v-col>
-            <v-col>
-              <div class="caption grey--text">{{ $t('deletedAt') }}</div>
-              <div>
-                {{ product.deletedAt || $t('blank') }}
-              </div>
-            </v-col>
-          </v-row>
-          <!-- Save translation -->
-          <v-row>
-            <v-col class="mb-2">
-              <v-btn
-                color="success"
-                :disabled="!isDataChanged"
-                @click="createOrUpdateProductTranslation()"
-                class="mr-5"
-              >
-                {{ $t('save') }}
-              </v-btn>
-            </v-col>
-          </v-row>
-        </v-col>
-        <!-- Assets -->
-        <v-col>Maybe assets?</v-col>
-      </v-row>
+              </v-col>
+              <v-col>
+                <div class="d-inline-flex align-center">
+                  <v-text-field
+                    :label="$t('slug')"
+                    value="2"
+                    hide-details
+                    disabled
+                    :loading="slugIsLoading"
+                    v-model="selectedTranslation.slug"
+                  ></v-text-field>
+                  <v-btn icon class="mt-4" small @click="refreshSlug()">
+                    <v-icon>mdi-refresh</v-icon>
+                  </v-btn>
+                </div>
+              </v-col>
+            </v-row>
+            <!-- Dates -->
+            <v-row>
+              <v-col>
+                <div class="caption grey--text">{{ $t('createdAt') }}</div>
+                <div>{{ product.createdAt }}</div>
+              </v-col>
+              <v-col>
+                <div class="caption grey--text">{{ $t('updatedAt') }}</div>
+                <div>{{ product.updatedAt }}</div>
+              </v-col>
+              <v-col>
+                <div class="caption grey--text">{{ $t('deletedAt') }}</div>
+                <div>
+                  {{ product.deletedAt || $t('blank') }}
+                </div>
+              </v-col>
+            </v-row>
+          </v-col>
+          <!-- Assets -->
+          <v-col>
+            <v-textarea
+              outlined
+              v-model="selectedTranslation.description"
+              @input="descriptionInput"
+              :label="$t('description')"
+              hide-details
+              class="mt-6"
+              rows="6"
+            ></v-textarea>
+          </v-col>
+        </v-row>
+        <!-- Save translation -->
+        <v-row>
+          <v-col class="mb-2">
+            <v-btn
+              color="success"
+              :disabled="!canSaveTranslation"
+              @click="createOrUpdateProductTranslation()"
+              class="mr-5"
+            >
+              {{ $t('save') }}
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-form>
     </v-card>
   </div>
 </template>
 
 <script lang="ts">
 import _ from 'lodash'
-import { defineComponent, ref } from '@vue/composition-api'
+import { computed, defineComponent, ref } from '@vue/composition-api'
 import { useMutation, useQuery, useResult } from '@vue/apollo-composable'
 import PRODUCT from '@/graphql/queries/PRODUCT'
 import GENERATE_SLUG from '@/graphql/mutations/GENERATE_PRODUCT_TRANSLATION_SLUG'
@@ -136,13 +150,44 @@ export default defineComponent({
       },
       { fetchPolicy: 'no-cache' }
     )
-    const selectedTranslation = ref<
-      UnwrapArray<NonNullable<ProductByIdQuery['product']>['translations']>
-    >()
 
+    type SelectedTranslation = UnwrapArray<
+      NonNullable<ProductByIdQuery['product']>['translations']
+    >
+    const selectedTranslation = ref<SelectedTranslation>()
+
+    // Validation rules
+    const selectedTranslationRules: {
+      [K in keyof Partial<SelectedTranslation>]: ((
+        arg: SelectedTranslation[K]
+      ) => boolean)[]
+    } = {
+      title: [(val) => (val && !!val.length && !!val.trim().length) || false],
+    }
+
+    // Data monitor
     const { isDataChanged, makeDataEqual, getDataDifference } = useDataMonitor(
       selectedTranslation
     )
+
+    const canSaveTranslation = computed(() => {
+      if (!selectedTranslation.value) return false
+
+      const rules = Object.entries(selectedTranslationRules) as [
+        keyof SelectedTranslation,
+        [(arg: SelectedTranslation[keyof SelectedTranslation]) => boolean]
+      ][]
+
+      return (
+        isDataChanged.value &&
+        rules.some(([key, value]) => {
+          return value.some((val) => {
+            if (!selectedTranslation.value) return true
+            return val(selectedTranslation.value[key])
+          })
+        })
+      )
+    })
 
     const product = useResult(result, null, (data) => data.product)
 
@@ -154,7 +199,7 @@ export default defineComponent({
 
         selectedTranslation.value = _.merge(
           {},
-          translation || { title: '', slug: '' }
+          translation || { slug: '' }
         ) as never
         makeDataEqual()
       }
@@ -210,16 +255,27 @@ export default defineComponent({
       }
 
       input.languageCode = currentLanguageCode
+      if (input.title) input.title = input.title.trim()
+      if (input.description) input.description = input.description.trim()
       await createOrUpdateTranslation({ id: product.value.id, input })
 
       refetchProduct()
     }
 
+    // Set description back to null
+    const descriptionInput = (value: string) => {
+      if (selectedTranslation.value && !value)
+        selectedTranslation.value.description = null
+    }
+
     return {
       product,
       selectedTranslation,
+      selectedTranslationRules,
+      canSaveTranslation,
       changeProductLanguage,
       isDataChanged,
+      descriptionInput,
       createOrUpdateProductTranslation,
       refreshSlug,
       slugIsLoading,
@@ -237,11 +293,11 @@ export default defineComponent({
   border-radius: 5px 5px 0px 0px;
   cursor: pointer;
   opacity: 0.7;
+  transition: all 0.3s ease-out;
 }
 
 .product-language_selected {
   opacity: 1;
   background-color: inherit;
-  transition: all 0.3s ease-out;
 }
 </style>

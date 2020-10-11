@@ -17,6 +17,7 @@
   "email": "El. paštas",
   "title": "Pavadinimas",
   "slug": "Slug",
+  "description": "Aprašymas",
   "firstname": "Vardas",
   "lastname": "Pavardė",
   "confirmed": "Patvirtintas",
